@@ -1,13 +1,32 @@
 import express from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const app = express();
 
-app.post('hooks/catch/:userId/:taskId', (req, res) => {
+const client = new PrismaClient();
+
+app.post('hooks/catch/:userId/:taskId', async (req, res) => {
 	const { userId, taskId } = req.params;
+	const body = req.body;
 
-	// store in db a new trigger
+	await client.$transaction(async (tx) => {
+		const run = await tx.taskRun.create({
+			data: {
+				taskId: taskId,
+				metadata: body,
+			},
+		});
 
-	// push it on to a redis queue
+		await tx.taskRunOutbox.create({
+			data: {
+				taskRunId: run.id,
+			},
+		});
+	});
+
+	res.status(200).json({
+		message: 'webhook received',
+	});
 });
 
 app.get('/', (req, res) => {

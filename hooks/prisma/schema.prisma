@@ -18,28 +18,58 @@ model User {
   name     String
   email    String @unique
   password String
-  task     Task[]
+  tasks    Task[]
 }
 
 model Task {
   id          String    @id @default(cuid())
   title       String
   description String?
-  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
-  trigger     Trigger[]
+  triggers    Trigger[]
+  actions     Action[]
+  taskRuns    TaskRun[]
 }
 
 model Trigger {
   id                  String            @id @default(cuid())
   availableTrigger    AvailableTriggers @relation(fields: [availableTriggersId], references: [id])
   availableTriggersId String
-  Task                Task              @relation(fields: [taskId], references: [id])
-  taskId              String
+  task                Task?             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId              String?
 }
 
 model AvailableTriggers {
-  id      String    @id @default(cuid())
+  id       String    @id @default(cuid())
+  name     String
+  triggers Trigger[]
+}
+
+model Action {
+  id                 String            @id @default(cuid())
+  availableAction    AvailableActions? @relation(fields: [availableActionsId], references: [id])
+  availableActionsId String?
+  task               Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId             String
+}
+
+model AvailableActions {
+  id      String   @id @default(cuid())
   name    String
-  trigger Trigger[]
+  actions Action[]
+}
+
+model TaskRun {
+  id            String         @id @default(cuid())
+  metadata      Json
+  task          Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId        String
+  taskRunOutbox TaskRunOutbox?
+}
+
+model TaskRunOutbox {
+  id        String  @id @default(cuid())
+  taskRun   TaskRun @relation(fields: [taskRunId], references: [id], onDelete: Cascade)
+  taskRunId String  @unique
 }
