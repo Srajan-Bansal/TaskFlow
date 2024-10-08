@@ -38,7 +38,6 @@ model Trigger {
   availableTriggersId String
   task                Task?             @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId              String?
-  sortingOrder        Int               @default(0)
 }
 
 model AvailableTriggers {
@@ -53,6 +52,7 @@ model Action {
   availableActionsId String?
   task               Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId             String
+  sortingOrder       Int               @default(0)
 }
 
 model AvailableActions {
