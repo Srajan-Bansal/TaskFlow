@@ -14,9 +14,11 @@
 	"dependencies": {
 		"@repo/db": "*",
 		"bcryptjs": "^2.4.3",
-		"jsonwebtoken": "^9.0.2"
+		"jsonwebtoken": "^9.0.2",
+		"express": "^4.21.1"
 	},
 	"devDependencies": {
+		"@types/express": "^5.0.0",
 		"@types/bcryptjs": "^2.4.6",
 		"@types/jsonwebtoken": "^9.0.7"
 	}
