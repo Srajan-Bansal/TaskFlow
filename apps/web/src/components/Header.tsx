@@ -6,30 +6,22 @@ export const Header = () => {
 	const navigate = useNavigate();
 
 	return (
-		<header className='flex border-b justify-between p-4'>
-			<div className='flex flex-col justify-center text-2xl font-extrabold'>
-				TaskFlow
-			</div>
-			<div className='flex'>
-				<div className='pr-4'>
+		<header className='border-b'>
+			<div className='container flex justify-between py-6 px-4 mx-auto'>
+				<div className='text-2xl font-extrabold'>TaskFlow</div>
+				<div className='flex space-x-4'>
 					<LinkButton onClick={() => {}}>Contact Sales</LinkButton>
-				</div>
-				<div className='pr-4'>
-					<LinkButton
-						onClick={() => {
-							navigate('/app/login');
-						}}
-					>
+					<LinkButton onClick={() => navigate('/app/login')}>
 						Login
 					</LinkButton>
+					<PrimaryButton
+						onClick={() => {
+							navigate('/sign-up');
+						}}
+					>
+						Signup
+					</PrimaryButton>
 				</div>
-				<PrimaryButton
-					onClick={() => {
-						navigate('/signup');
-					}}
-				>
-					Signup
-				</PrimaryButton>
 			</div>
 		</header>
 	);
