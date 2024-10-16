@@ -28,8 +28,8 @@ const sendCookie = (res: Response, token: string): void => {
 
 export const signup = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const { name, email, password } = req.body;
-		if (!name || !email || !password) {
+		const { firstName, lastName, email, password } = req.body;
+		if (!firstName || !lastName || !email || !password) {
 			return next(
 				new AppError({
 					statusCode: 400,
@@ -40,7 +40,8 @@ export const signup = catchAsync(
 
 		const user = await prisma.user.create({
 			data: {
-				name,
+				FirstName: firstName,
+				LastName: lastName,
 				email,
 				password,
 			},
