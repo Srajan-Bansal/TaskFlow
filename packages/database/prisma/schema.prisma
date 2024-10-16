@@ -14,66 +14,78 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(cuid())
-  name     String
-  email    String @unique
-  password String
-  tasks    Task[]
+  id        String @id @default(cuid())
+  FirstName String
+  LastName  String
+  email     String @unique
+  password  String
+  tasks     Task[]
 }
 
 model Task {
   id          String    @id @default(cuid())
-  title       String
+  title       String    @default("Untitled Task")
   description String?
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
-  triggers    Trigger[]
+  trigger     Trigger?
   actions     Action[]
   taskRuns    TaskRun[]
+  triggerId   String
 }
 
 model Trigger {
-  id                  String            @id @default(cuid())
+  id       String @id @default(cuid())
+  metadata Json   @default("{}")
+
+  task   Task?  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String @unique
+
   availableTrigger    AvailableTriggers @relation(fields: [availableTriggersId], references: [id])
   availableTriggersId String
-  task                Task?             @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  taskId              String?
 }
 
 model AvailableTriggers {
   id       String    @id @default(cuid())
   name     String
+  image    String?
   triggers Trigger[]
 }
 
 model Action {
-  id                 String            @id @default(cuid())
+  id           String @id @default(cuid())
+  sortingOrder Int    @default(0)
+  metadata     Json   @default("{}")
+
   availableAction    AvailableActions? @relation(fields: [availableActionsId], references: [id])
   availableActionsId String?
-  task               Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  taskId             String
-  sortingOrder       Int               @default(0)
+
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
 }
 
 model AvailableActions {
   id      String   @id @default(cuid())
   name    String
+  image   String?
   actions Action[]
 }
 
 model TaskRun {
   id            String         @id @default(cuid())
-  metadata      Json
-  task          Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  taskId        String
+  metadata      Json           @default("{}")
   taskRunOutbox TaskRunOutbox?
+
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
 }
 
 model TaskRunOutbox {
-  id        String  @id @default(cuid())
+  id     String @id @default(cuid())
+  status Status @default(PENDING)
+
   taskRun   TaskRun @relation(fields: [taskRunId], references: [id], onDelete: Cascade)
   taskRunId String  @unique
-  status    Status  @default(PENDING)
 }
 
 enum Status {
