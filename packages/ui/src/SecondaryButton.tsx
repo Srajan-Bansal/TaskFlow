@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, MouseEventHandler } from 'react';
 
 export const SecondaryButton = ({
 	children,
@@ -6,7 +6,7 @@ export const SecondaryButton = ({
 	size = 'small',
 }: {
 	children: ReactNode;
-	onClick: () => void;
+	onClick?: MouseEventHandler<HTMLButtonElement>;
 	size?: 'big' | 'small';
 }) => {
 	return (

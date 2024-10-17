@@ -29,10 +29,7 @@ export const Hero = () => {
 						>
 							Start free with email
 						</PrimaryButton>
-						<SecondaryButton
-							size='big'
-							onClick={() => {}}
-						>
+						<SecondaryButton size='big'>
 							<img
 								src='/path-to-google-icon.png'
 								alt='Google'

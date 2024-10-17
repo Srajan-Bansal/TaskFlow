@@ -6,9 +6,10 @@ import {
 } from 'react-router-dom';
 
 import { Home } from './pages/Home';
-import { SignUp } from './pages/Signup';
+import { Signup } from './pages/Signup';
 import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
+import { Dashboard } from './pages/Dashboard';
 
 const App = () => {
 	const router = createBrowserRouter(
@@ -23,11 +24,15 @@ const App = () => {
 				/>
 				<Route
 					path='sign-up'
-					element={<SignUp />}
+					element={<Signup />}
 				/>
 				<Route
 					path='/app/login'
 					element={<Login />}
+				/>
+				<Route
+					path='/app/home'
+					element={<Dashboard />}
 				/>
 			</Route>
 		)

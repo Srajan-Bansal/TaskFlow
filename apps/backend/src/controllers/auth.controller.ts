@@ -71,6 +71,7 @@ export const signup = catchAsync(
 		const token = generateToken(user.id);
 		sendCookie(res, token);
 
+
 		const userData = {
 			firstName: user.FirstName,
 			lastName: user.LastName,

@@ -38,6 +38,7 @@ export const protect = catchAsync(
 			);
 		}
 
+		// @ts-ignore
 		req.user = user;
 		next();
 	}

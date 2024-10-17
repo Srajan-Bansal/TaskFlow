@@ -68,6 +68,38 @@ app.use(
 	}
 );
 
+app.use('*', (req, res, next) => {
+	next(
+		new AppError({
+			statusCode: 404,
+			message: `Can't find ${req.originalUrl} on this server!`,
+		})
+	);
+});
+
+app.use(
+	({
+		err,
+		req,
+		res,
+		next,
+	}: {
+		err: ErrorResponse;
+		req: Request;
+		res: Response;
+		next: NextFunction;
+	}) => {
+		err.statusCode = err.statusCode || 500;
+		err.message = err.message || 'Something went wrong!';
+
+		console.log(err);
+
+		res.status(err.statusCode).json({
+			message: err.message,
+		});
+	}
+);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
 	console.log('Server is running on port 3000');
