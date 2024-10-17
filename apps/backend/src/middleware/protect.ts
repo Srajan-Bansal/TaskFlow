@@ -6,7 +6,7 @@ import catchAsync from '../utils/catchAsync';
 
 export const protect = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const token = req.cookies.jwt;
+		const token = req.cookies.authToken;
 		if (!token) {
 			return next(
 				new AppError({
