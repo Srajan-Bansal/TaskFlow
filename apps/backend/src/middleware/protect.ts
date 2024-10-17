@@ -7,6 +7,7 @@ import catchAsync from '../utils/catchAsync';
 export const protect = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
 		const token = req.cookies.jwt;
+		console.log('refwefwefew', req.cookies.jwt);
 		if (!token) {
 			return next(
 				new AppError({
@@ -38,6 +39,7 @@ export const protect = catchAsync(
 			);
 		}
 
+		// @ts-ignore
 		req.user = user;
 		next();
 	}

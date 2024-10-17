@@ -23,7 +23,7 @@ const sendCookie = (res: Response, token: string): void => {
 		sameSite: process.env.ENVIRONMENT === 'production' ? 'none' : 'lax',
 		secure: process.env.ENVIRONMENT === 'production',
 	};
-	res.cookie('jwt', token, cookieOptions);
+	res.cookie('token', token, cookieOptions);
 };
 
 export const signup = catchAsync(
@@ -34,6 +34,16 @@ export const signup = catchAsync(
 				new AppError({
 					statusCode: 400,
 					message: 'Name, email and password are required',
+				})
+			);
+		}
+
+		const existingUser = await prisma.user.findUnique({ where: { email } });
+		if (existingUser) {
+			return next(
+				new AppError({
+					message: 'User already exists with this email',
+					statusCode: 400,
 				})
 			);
 		}
@@ -59,7 +69,7 @@ export const signup = catchAsync(
 		const token = generateToken(user.id);
 		sendCookie(res, token);
 
-		res.status(201).json(user);
+		res.status(201).json({ user, token });
 	}
 );
 

@@ -1,12 +1,15 @@
+import { ChangeEventHandler } from 'react';
+
 export const Input = ({
-	type,
+	type = 'text',
 	label,
 	required,
-	...props
+	onChange = () => {},
 }: {
 	type: string;
 	label: string;
 	required?: boolean;
+	onChange?: ChangeEventHandler<HTMLInputElement>;
 }) => (
 	<div className='flex flex-col justify-center space-y-4'>
 		<label
@@ -20,10 +23,11 @@ export const Input = ({
 			</span>
 		</label>
 		<input
+			id={label}
 			className='p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 w-full h-12'
 			type={type}
 			required={required}
-			{...props}
+			onChange={onChange}
 		/>
 	</div>
 );

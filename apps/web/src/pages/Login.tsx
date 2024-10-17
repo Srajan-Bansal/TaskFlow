@@ -35,7 +35,6 @@ export const Login = () => {
 						/>
 
 						<PrimaryButton
-							onClick={() => {}}
 							size='big'
 							className='w-full'
 						>
