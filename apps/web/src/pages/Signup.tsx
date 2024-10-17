@@ -20,8 +20,8 @@ export const Signup = () => {
 	const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			await signUpUser(user);
-			navigate('/app/home');
+			const success = await signUpUser(user);
+			if (success) navigate('/app/home');
 		} catch (err) {
 			showErrorToast('Sign-up failed. Please try again.');
 			console.error(err);

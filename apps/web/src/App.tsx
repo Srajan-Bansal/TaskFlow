@@ -8,7 +8,7 @@ import {
 import { Home } from './pages/Home';
 import { Signup } from './pages/Signup';
 import { Layout } from './components/Layout';
-import { Login } from './pages/Login';
+import { Signin } from './pages/Signin';
 import { Dashboard } from './pages/Dashboard';
 
 const App = () => {
@@ -28,7 +28,7 @@ const App = () => {
 				/>
 				<Route
 					path='/app/login'
-					element={<Login />}
+					element={<Signin />}
 				/>
 				<Route
 					path='/app/home'

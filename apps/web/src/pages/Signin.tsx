@@ -1,8 +1,29 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@repo/ui/Input';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
+import { SignInUser } from '../types';
+import { useSignIn } from '../hooks/useSignIn';
+import { showErrorToast, TOAST_MESSAGES } from '../lib/toaster';
 
-export const Login = () => {
+export const Signin = () => {
+	const [user, setUser] = useState<SignInUser>({
+		email: '',
+		password: '',
+	});
+	const { signInUser, loading, error } = useSignIn();
+	const navigate = useNavigate();
+
+	async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		try {
+			const success = await signInUser(user);
+			if (success) navigate('/app/home');
+		} catch (err) {
+			showErrorToast(TOAST_MESSAGES.AUTH.LOGIN_ERROR);
+			console.error('err', err);
+		}
+	}
 	return (
 		<div className='container mx-auto py-20'>
 			<div className='flex flex-row justify-between items-center'>
@@ -22,23 +43,39 @@ export const Login = () => {
 					<div className=' font-semibold text-4xl lg:text-5xl text-center'>
 						Log in to your account
 					</div>
-					<form className='bg-white p-6 rounded-lg shadow-lg space-y-4'>
+					<form
+						className='bg-white p-6 rounded-lg shadow-lg space-y-4'
+						onSubmit={handleSignIn}
+					>
 						<Input
 							type={'email'}
 							label={'Work Email'}
 							required={true}
+							onChange={(e) =>
+								setUser({ ...user, email: e.target.value })
+							}
 						/>
 						<Input
 							type={'password'}
 							label={'Password'}
 							required={true}
+							onChange={(e) =>
+								setUser({ ...user, password: e.target.value })
+							}
 						/>
+
+						{error && (
+							<p className='text-red-600 text-sm'>
+								{error.message}
+							</p>
+						)}
 
 						<PrimaryButton
 							size='big'
 							className='w-full'
+							disabled={loading}
 						>
-							Login
+							{loading ? 'Loging in' : 'Log In'}
 						</PrimaryButton>
 						<p className='text-medium text-gray-600 text-center'>
 							Don't have a TaskFlow account yet?{' '}
