@@ -3,6 +3,7 @@ import { userRouter } from './routes/user.route';
 import { taskRouter } from './routes/task.route';
 import { actionRouter } from './routes/action.route';
 import { triggerRouter } from './routes/trigger.route';
+import { adminRouter } from './routes/admin.route';
 import cors from 'cors';
 import ErrorResponse from './types/types';
 import AppError from './utils/appError';
@@ -33,6 +34,39 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/task', taskRouter);
 app.use('/api/v1/action', actionRouter);
 app.use('/api/v1/trigger', triggerRouter);
+app.use('/api/v1/admin', adminRouter);
+
+app.use('*', (req, res, next) => {
+	next(
+		new AppError({
+			statusCode: 404,
+			message: `Can't find ${req.originalUrl} on this server!`,
+		})
+	);
+});
+
+app.use(
+	({
+		err,
+		req,
+		res,
+		next,
+	}: {
+		err: ErrorResponse;
+		req: Request;
+		res: Response;
+		next: NextFunction;
+	}) => {
+		err.statusCode = err.statusCode || 500;
+		err.message = err.message || 'Something went wrong!';
+
+		console.log(err);
+
+		res.status(err.statusCode).json({
+			message: err.message,
+		});
+	}
+);
 
 app.use('*', (req, res, next) => {
 	next(
