@@ -11,7 +11,7 @@ export const useTasks = () => {
 		const fetchTasks = async () => {
 			try {
 				const data = await getAllTasks();
-				setTasks(data);
+				if (data) setTasks(data);
 			} catch (err: unknown) {
 				if (err instanceof Error) {
 					setError(err);

@@ -16,21 +16,29 @@ export const signUp = async ({
 	lastName,
 	password,
 }: SignUpUser) => {
-	const res = await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
-		email,
-		firstName,
-		lastName,
-		password,
-	});
+	const res = await axios.post(
+		`${BACKEND_URL}/api/v1/user/signup`,
+		{
+			email,
+			firstName,
+			lastName,
+			password,
+		},
+		{ withCredentials: true }
+	);
 
 	return res.data;
 };
 
 export const signIn = async ({ email, password }: SignInUser) => {
-	const res = await axios.post(`${BACKEND_URL}/api/v1/user/login`, {
-		email,
-		password,
-	});
+	const res = await axios.post(
+		`${BACKEND_URL}/api/v1/user/login`,
+		{
+			email,
+			password,
+		},
+		{ withCredentials: true }
+	);
 
 	return res.data;
 };

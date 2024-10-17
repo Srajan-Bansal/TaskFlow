@@ -13,13 +13,18 @@ export const useSignUp = () => {
 		password,
 	}: SignUpUser) => {
 		setLoading(true);
+		setError(null);
 		try {
 			await signUp({ email, firstName, lastName, password });
+			return true;
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err);
+				throw err;
 			} else {
-				setError(new Error('An unknown error occurred'));
+				const error = new Error('An unknown error occurred');
+				setError(error);
+				throw error;
 			}
 		} finally {
 			setLoading(false);
