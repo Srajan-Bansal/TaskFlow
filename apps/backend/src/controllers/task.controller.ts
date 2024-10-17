@@ -5,6 +5,7 @@ import AppError from '../utils/appError';
 import { TaskCreateSchema } from '../types/types';
 
 export const getUserTasks = catchAsync(async (req: Request, res: Response) => {
+	// @ts-ignore
 	const id = req.user?.id;
 
 	const tasks = await prisma.task.findMany({
@@ -30,6 +31,7 @@ export const getUserTasks = catchAsync(async (req: Request, res: Response) => {
 
 export const getTask = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
+		// @ts-ignore
 		const id = req.user?.id;
 		const taskId = req.params.id;
 
@@ -60,21 +62,13 @@ export const getTask = catchAsync(
 			},
 		});
 
-		if (!task) {
-			return next(
-				new AppError({
-					statusCode: 404,
-					message: 'Task not found',
-				})
-			);
-		}
-
 		res.status(200).json(task);
 	}
 );
 
 export const createTask = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
+		// @ts-ignore
 		const id = req.user?.id;
 		const body: TaskCreateSchema = req.body;
 

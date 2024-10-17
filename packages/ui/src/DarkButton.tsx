@@ -1,16 +1,18 @@
 import { ReactNode, MouseEventHandler } from 'react';
 
-export const LinkButton = ({
+export const DarkButton = ({
 	children,
 	onClick,
 }: {
 	children: ReactNode;
 	onClick?: MouseEventHandler<HTMLButtonElement>;
+
+	size?: 'big' | 'small';
 }) => {
 	return (
 		<button
-			className='flex justify-center px-2 py-2 cursor-pointer hover:bg-slate-100 font-light text-sm rounded'
 			onClick={onClick}
+			className={`px-6 py-2 cursor-pointer hover:shadow-lg border text-center flex flex-row justify-center items-center font-bold bg-[#3d4592] text-white`}
 		>
 			{children}
 		</button>
