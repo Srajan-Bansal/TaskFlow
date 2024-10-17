@@ -11,7 +11,7 @@ const generateToken = (id: string): string => {
 	});
 };
 
-const sendCookie = (res: Response, token: string): void => {
+const sendCookie = (res: Response, token: string) => {
 	const cookieOptions: CookieOptions = {
 		maxAge:
 			parseInt(process.env.JWT_COOKIE_EXPIRES_IN as string) *
@@ -23,12 +23,12 @@ const sendCookie = (res: Response, token: string): void => {
 		sameSite: process.env.ENVIRONMENT === 'production' ? 'none' : 'lax',
 		secure: process.env.ENVIRONMENT === 'production',
 	};
-	res.cookie('token', token, cookieOptions);
+	res.cookie('authToken', token, cookieOptions);
 };
 
 export const signup = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const { firstName, lastName, email, password } = req.body;
+		let { firstName, lastName, email, password } = req.body;
 		if (!firstName || !lastName || !email || !password) {
 			return next(
 				new AppError({
@@ -47,6 +47,8 @@ export const signup = catchAsync(
 				})
 			);
 		}
+
+		password = await bcrypt.hash(password, 10);
 
 		const user = await prisma.user.create({
 			data: {
@@ -69,7 +71,14 @@ export const signup = catchAsync(
 		const token = generateToken(user.id);
 		sendCookie(res, token);
 
-		res.status(201).json({ user, token });
+
+		const userData = {
+			firstName: user.FirstName,
+			lastName: user.LastName,
+			email: user.email,
+		};
+
+		res.status(201).json(userData);
 	}
 );
 
@@ -87,7 +96,7 @@ export const login = catchAsync(
 
 		const user = await prisma.user.findUnique({
 			where: {
-				email,
+				email: email,
 			},
 		});
 
@@ -106,12 +115,18 @@ export const login = catchAsync(
 		const token = generateToken(user.id);
 		sendCookie(res, token);
 
-		res.status(200).json(user);
+		const userData = {
+			firstName: user.FirstName,
+			lastName: user.LastName,
+			email: user.email,
+		};
+
+		res.status(200).json(userData);
 	}
 );
 
 export const logout = async (req: Request, res: Response) => {
-	res.cookie('jwt', '', {
+	res.cookie('authToken', '', {
 		maxAge: 0,
 		httpOnly: true,
 	});
