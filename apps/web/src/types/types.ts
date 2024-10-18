@@ -18,3 +18,15 @@ export type SignInUser = {
 	email: string;
 	password: string;
 };
+
+export type TriggerNode = {
+	data: {
+		label: string;
+	};
+};
+
+export type ActionNode = {
+	data: {
+		label: string;
+	};
+};

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@repo/ui/Input';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
-import { SignInUser } from '../types';
+import { SignInUser } from '../types/types';
 import { useSignIn } from '../hooks/useSignIn';
 import { showErrorToast, TOAST_MESSAGES } from '../lib/toaster';
 

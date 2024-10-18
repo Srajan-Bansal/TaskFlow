@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SignInUser } from './../types/index';
+import { SignInUser } from '../types/types';
 import { signIn } from '../lib/api';
 
 export const useSignIn = () => {
