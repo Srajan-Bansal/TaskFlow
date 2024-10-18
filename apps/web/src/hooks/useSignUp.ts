@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SignUpUser } from './../types/index';
+import { SignUpUser } from '../types/types';
 import { signUp } from '../lib/api';
 
 export const useSignUp = () => {

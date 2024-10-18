@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@repo/ui/Input';
 import { CheckFeature } from '../components/CheckFeature';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
-import { SignUpUser } from './../types/index';
+import { SignUpUser } from '../types/types';
 import { showErrorToast } from '../lib/toaster';
 import { useSignUp } from '../hooks/useSignUp';
 

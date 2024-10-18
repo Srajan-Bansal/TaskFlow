@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { DarkButton } from '@repo/ui/DarkButton';
 import { Spinner } from '@repo/ui/Spinner';
 import { useTasks } from '../hooks/useTasks';
-import { Task } from '../types';
+import { Task } from '../types/types';
 import { showErrorToast } from '../lib/toaster';
 import { HOOKS_URL } from './../config';
+import { Plus } from 'lucide-react';
 
 export const Dashboard = () => {
 	const { tasks, loading, error } = useTasks();
@@ -30,7 +31,7 @@ export const Dashboard = () => {
 								navigate('task/create');
 							}}
 						>
-							+ Create
+							<Plus className='mr-2' /> Create
 						</DarkButton>
 					</div>
 				</div>

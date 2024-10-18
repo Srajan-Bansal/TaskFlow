@@ -10,6 +10,7 @@ import { Signup } from './pages/Signup';
 import { Layout } from './components/Layout';
 import { Signin } from './pages/Signin';
 import { Dashboard } from './pages/Dashboard';
+import { Create } from './pages/Create';
 
 const App = () => {
 	const router = createBrowserRouter(
@@ -33,6 +34,10 @@ const App = () => {
 				<Route
 					path='/app/home'
 					element={<Dashboard />}
+				/>
+				<Route
+					path='/app/create'
+					element={<Create />}
 				/>
 			</Route>
 		)
