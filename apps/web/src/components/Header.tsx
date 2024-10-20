@@ -1,8 +1,11 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { LinkButton } from '@repo/ui/LinkButton';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
+import { ProfilePic } from './ProfilePic';
+import { useContextAPI } from '../Context/ContexrAPI';
 
 export const Header = () => {
+	const { isAuthenticated } = useContextAPI();
 	const navigate = useNavigate();
 
 	return (
@@ -16,16 +19,22 @@ export const Header = () => {
 				</Link>
 				<div className='flex space-x-4'>
 					<LinkButton>Contact Sales</LinkButton>
-					<LinkButton onClick={() => navigate('/app/login')}>
-						Login
-					</LinkButton>
-					<PrimaryButton
-						onClick={() => {
-							navigate('/sign-up');
-						}}
-					>
-						Signup
-					</PrimaryButton>
+					{!isAuthenticated ? (
+						<>
+							<LinkButton onClick={() => navigate('/app/login')}>
+								Login
+							</LinkButton>
+							<PrimaryButton
+								onClick={() => {
+									navigate('/sign-up');
+								}}
+							>
+								Signup
+							</PrimaryButton>
+						</>
+					) : (
+						<ProfilePic initials={'SB'} />
+					)}
 				</div>
 			</div>
 		</header>

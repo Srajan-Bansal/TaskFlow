@@ -44,7 +44,7 @@ export const Dashboard = () => {
 
 function TaskTable({ tasks }: { tasks: Task[] }) {
 	return (
-		<div className='p-8 max-w-screen-lg w-full'>
+		<div className='p-8 max-w-screen-lg mx-auto'>
 			<div className='flex font-bold'>
 				<div className='flex-1'>Name</div>
 				<div className='flex-1'>ID</div>

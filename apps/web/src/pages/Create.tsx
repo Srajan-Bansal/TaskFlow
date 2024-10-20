@@ -107,7 +107,11 @@ export const Create = () => {
 	const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
 		console.log('event', event);
 		console.log('click', node);
-		node.data = { label: 'New Label' };
+		node.style = {
+			border: '2px solid rgb(81, 64, 191)',
+			borderRadius: '10px',
+		};
+		setNodes((nds) => nds.map((n) => (n.id === node.id ? node : n)));
 	}, []);
 
 	const addActionNode = useCallback(() => {
@@ -146,7 +150,7 @@ export const Create = () => {
 					color='#374151'
 				/>
 				<Controls className='absolute top-2 left-2' />
-				<MiniMap className='absolute bottom-2 left-2' />
+				<MiniMap className='absolute bottom-2 left-2 ml-12 w-[200px]' />
 
 				<Panel
 					position='bottom-center'
