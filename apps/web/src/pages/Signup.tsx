@@ -6,7 +6,7 @@ import { PrimaryButton } from '@repo/ui/PrimaryButton';
 import { SignUpUser } from '../types/types';
 import { showErrorToast } from '../lib/toaster';
 import { useSignUp } from '../hooks/useSignUp';
-import { useContextAPI } from '../Context/ContexrAPI';
+import { useContextAPI } from '../Context/ContextAPI';
 
 export const Signup = () => {
 	const [user, setUser] = useState<SignUpUser>({

@@ -52,8 +52,8 @@ export const signup = catchAsync(
 
 		const user = await prisma.user.create({
 			data: {
-				FirstName: firstName,
-				LastName: lastName,
+				firstName: firstName,
+				lastName: lastName,
 				email,
 				password,
 			},
@@ -72,8 +72,8 @@ export const signup = catchAsync(
 		sendCookie(res, token);
 
 		const userData = {
-			firstName: user.FirstName,
-			lastName: user.LastName,
+			firstName: user.firstName,
+			lastName: user.lastName,
 			email: user.email,
 		};
 
@@ -115,8 +115,8 @@ export const login = catchAsync(
 		sendCookie(res, token);
 
 		const userData = {
-			firstName: user.FirstName,
-			lastName: user.LastName,
+			firstName: user.firstName,
+			lastName: user.lastName,
 			email: user.email,
 		};
 
@@ -148,8 +148,8 @@ export const verifyUser = catchAsync(async (req: Request, res: Response) => {
 			id: decoded.id,
 		},
 		select: {
-			FirstName: true,
-			LastName: true,
+			firstName: true,
+			lastName: true,
 			email: true,
 		},
 	});

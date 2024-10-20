@@ -42,4 +42,5 @@ export type ContextAPIType = {
 	setIsAuthenticated: (value: boolean) => void;
 	user: UserType | null;
 	setUser: (value: UserType) => void;
+	isLoading: boolean;
 };

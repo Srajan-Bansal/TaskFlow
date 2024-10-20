@@ -2,11 +2,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import { LinkButton } from '@repo/ui/LinkButton';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
 import { ProfilePic } from './ProfilePic';
-import { useContextAPI } from '../Context/ContexrAPI';
+import { useContextAPI } from '../Context/ContextAPI';
 
 export const Header = () => {
-	const { isAuthenticated } = useContextAPI();
+	const { user, isAuthenticated } = useContextAPI();
 	const navigate = useNavigate();
+
+	function handleInitials(): string {
+		if (user) {
+			return user.firstName[0] + user.lastName[0];
+		}
+
+		return 'AN';
+	}
 
 	return (
 		<header className='border-b'>
@@ -33,7 +41,7 @@ export const Header = () => {
 							</PrimaryButton>
 						</>
 					) : (
-						<ProfilePic initials={'SB'} />
+						<ProfilePic initials={handleInitials()} />
 					)}
 				</div>
 			</div>

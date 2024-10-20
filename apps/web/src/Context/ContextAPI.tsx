@@ -14,14 +14,17 @@ const ContextAPI = createContext<ContextAPIType>({
 	setIsAuthenticated: () => {},
 	user: null,
 	setUser: () => {},
+	isLoading: true,
 });
 
 export const ContextAPIPRovider = ({ children }: { children: ReactNode }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [user, setUser] = useState<UserType | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	useEffect(() => {
 		async function checkUser() {
+			setIsLoading(true);
 			try {
 				const res = await verifyUser();
 
@@ -36,6 +39,8 @@ export const ContextAPIPRovider = ({ children }: { children: ReactNode }) => {
 				setIsAuthenticated(false);
 				setUser(null);
 				showErrorToast('Error verifying user');
+			} finally {
+				setIsLoading(false);
 			}
 		}
 
@@ -47,6 +52,7 @@ export const ContextAPIPRovider = ({ children }: { children: ReactNode }) => {
 		setIsAuthenticated,
 		user,
 		setUser,
+		isLoading,
 	};
 
 	return <ContextAPI.Provider value={value}>{children}</ContextAPI.Provider>;
