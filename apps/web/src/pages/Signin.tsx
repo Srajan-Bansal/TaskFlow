@@ -5,6 +5,7 @@ import { PrimaryButton } from '@repo/ui/PrimaryButton';
 import { SignInUser } from '../types/types';
 import { useSignIn } from '../hooks/useSignIn';
 import { showErrorToast, TOAST_MESSAGES } from '../lib/toaster';
+import { useContextAPI } from '../Context/ContextAPI';
 
 export const Signin = () => {
 	const [user, setUser] = useState<SignInUser>({
@@ -12,13 +13,17 @@ export const Signin = () => {
 		password: '',
 	});
 	const { signInUser, loading, error } = useSignIn();
+	const { setIsAuthenticated } = useContextAPI();
 	const navigate = useNavigate();
 
 	async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		try {
 			const success = await signInUser(user);
-			if (success) navigate('/app/home');
+			if (success) {
+				setIsAuthenticated(true);
+				navigate('/app/home');
+			}
 		} catch (err) {
 			showErrorToast(TOAST_MESSAGES.AUTH.LOGIN_ERROR);
 			console.error('err', err);

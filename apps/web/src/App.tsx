@@ -3,16 +3,22 @@ import {
 	createRoutesFromElements,
 	RouterProvider,
 	Route,
+	Navigate,
 } from 'react-router-dom';
-
 import { Home } from './pages/Home';
 import { Signup } from './pages/Signup';
 import { Layout } from './components/Layout';
 import { Signin } from './pages/Signin';
 import { Dashboard } from './pages/Dashboard';
 import { Create } from './pages/Create';
+import { useContextAPI } from './Context/ContextAPI';
+import { Spinner } from '@repo/ui/Spinner';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
+	const { isLoading, isAuthenticated } = useContextAPI();
+	console.log(isAuthenticated);
+
 	const router = createBrowserRouter(
 		createRoutesFromElements(
 			<Route
@@ -25,25 +31,56 @@ const App = () => {
 				/>
 				<Route
 					path='sign-up'
-					element={<Signup />}
+					element={
+						!isAuthenticated ? (
+							<Signup />
+						) : (
+							<Navigate
+								to='/app/home'
+								replace
+							/>
+						)
+					}
 				/>
 				<Route
 					path='/app/login'
-					element={<Signin />}
+					element={
+						!isAuthenticated ? (
+							<Signin />
+						) : (
+							<Navigate
+								to='/app/home'
+								replace
+							/>
+						)
+					}
 				/>
 				<Route
 					path='/app/home'
-					element={<Dashboard />}
+					element={
+						<ProtectedRoute>
+							<Dashboard />
+						</ProtectedRoute>
+					}
 				/>
 				<Route
 					path='/app/create'
-					element={<Create />}
+					element={
+						<ProtectedRoute>
+							<Create />
+						</ProtectedRoute>
+					}
 				/>
 			</Route>
 		)
 	);
 
-	return <RouterProvider router={router} />;
+	return (
+		<>
+			{isLoading && <Spinner />}
+			<RouterProvider router={router} />
+		</>
+	);
 };
 
 export default App;

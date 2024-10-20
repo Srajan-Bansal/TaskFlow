@@ -52,8 +52,8 @@ export const signup = catchAsync(
 
 		const user = await prisma.user.create({
 			data: {
-				FirstName: firstName,
-				LastName: lastName,
+				firstName: firstName,
+				lastName: lastName,
 				email,
 				password,
 			},
@@ -71,10 +71,9 @@ export const signup = catchAsync(
 		const token = generateToken(user.id);
 		sendCookie(res, token);
 
-
 		const userData = {
-			firstName: user.FirstName,
-			lastName: user.LastName,
+			firstName: user.firstName,
+			lastName: user.lastName,
 			email: user.email,
 		};
 
@@ -116,8 +115,8 @@ export const login = catchAsync(
 		sendCookie(res, token);
 
 		const userData = {
-			firstName: user.FirstName,
-			lastName: user.LastName,
+			firstName: user.firstName,
+			lastName: user.lastName,
 			email: user.email,
 		};
 
@@ -132,3 +131,32 @@ export const logout = async (req: Request, res: Response) => {
 	});
 	res.status(200).send('User is logout');
 };
+
+export const verifyUser = catchAsync(async (req: Request, res: Response) => {
+	const token = req.cookies.authToken;
+	if (!token) {
+		return res.status(200).json({ ok: false });
+	}
+
+	const decoded = jwt.verify(
+		token,
+		process.env.JWT_SECRET as string
+	) as jwt.JwtPayload;
+
+	const user = await prisma.user.findUnique({
+		where: {
+			id: decoded.id,
+		},
+		select: {
+			firstName: true,
+			lastName: true,
+			email: true,
+		},
+	});
+
+	if (!user) {
+		return res.status(200).json({ ok: false });
+	}
+
+	res.status(200).json({ ok: true, data: user });
+});

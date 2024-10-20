@@ -6,6 +6,7 @@ import { PrimaryButton } from '@repo/ui/PrimaryButton';
 import { SignUpUser } from '../types/types';
 import { showErrorToast } from '../lib/toaster';
 import { useSignUp } from '../hooks/useSignUp';
+import { useContextAPI } from '../Context/ContextAPI';
 
 export const Signup = () => {
 	const [user, setUser] = useState<SignUpUser>({
@@ -15,13 +16,17 @@ export const Signup = () => {
 		password: '',
 	});
 	const { signUpUser, loading, error } = useSignUp();
+	const { setIsAuthenticated } = useContextAPI();
 	const navigate = useNavigate();
 
 	const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
 			const success = await signUpUser(user);
-			if (success) navigate('/app/home');
+			if (success) {
+				setIsAuthenticated(true);
+				navigate('/app/home');
+			}
 		} catch (err) {
 			showErrorToast('Sign-up failed. Please try again.');
 			console.error(err);

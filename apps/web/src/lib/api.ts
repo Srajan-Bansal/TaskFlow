@@ -26,6 +26,7 @@ export const signUp = async ({
 		},
 		{ withCredentials: true }
 	);
+	localStorage.setItem('authToken', res.data.token);
 
 	return res.data;
 };
@@ -39,6 +40,14 @@ export const signIn = async ({ email, password }: SignInUser) => {
 		},
 		{ withCredentials: true }
 	);
+
+	return res.data;
+};
+
+export const verifyUser = async () => {
+	const res = await axios.get(`${BACKEND_URL}/api/v1/user/verify`, {
+		withCredentials: true,
+	});
 
 	return res.data;
 };

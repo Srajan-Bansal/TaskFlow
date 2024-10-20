@@ -30,3 +30,17 @@ export type ActionNode = {
 		label: string;
 	};
 };
+
+export type UserType = {
+	firstName: string;
+	lastName: string;
+	email: string;
+};
+
+export type ContextAPIType = {
+	isAuthenticated: boolean;
+	setIsAuthenticated: (value: boolean) => void;
+	user: UserType | null;
+	setUser: (value: UserType) => void;
+	isLoading: boolean;
+};
