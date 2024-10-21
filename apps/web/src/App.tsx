@@ -17,7 +17,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
 	const { isLoading, isAuthenticated } = useContextAPI();
-	console.log(isAuthenticated);
 
 	const router = createBrowserRouter(
 		createRoutesFromElements(

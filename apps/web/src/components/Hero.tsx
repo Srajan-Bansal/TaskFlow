@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
-import { SecondaryButton } from '@repo/ui/SecondaryButton';
 
 export const Hero = () => {
 	const navigate = useNavigate();
@@ -29,21 +28,19 @@ export const Hero = () => {
 						>
 							Start free with email
 						</PrimaryButton>
-						<SecondaryButton size='big'>
-							<img
-								src='/path-to-google-icon.png'
-								alt='Google'
-								className='w-5 h-5 mr-2'
-							/>
-							Start free with Google
-						</SecondaryButton>
 					</div>
 				</div>
 				<div className='lg:w-1/2'>
 					<img
 						src='https://res.cloudinary.com/zapier-media/image/upload/q_auto/f_auto/v1726210651/Homepage%20%E2%80%94%20Sept%202024/homepage-hero_vvpkmi.png'
+						srcSet='
+    https://res.cloudinary.com/zapier-media/image/upload/f_auto,q_auto,w_800/v1726210651/Homepage%20%E2%80%94%20Sept%202024/homepage-hero_vvpkmi.png 800w,
+    https://res.cloudinary.com/zapier-media/image/upload/f_auto,q_auto,w_400/v1726210651/Homepage%20%E2%80%94%20Sept%202024/homepage-hero_vvpkmi.png 400w
+  '
+						sizes='(max-width: 768px) 100vw, 50vw'
 						alt='TaskFlow Automation Workflow'
 						className='w-full h-auto'
+						loading='lazy'
 					/>
 				</div>
 			</div>
