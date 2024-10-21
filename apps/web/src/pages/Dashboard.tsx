@@ -22,7 +22,7 @@ export const Dashboard = () => {
 		<div>
 			<div className='flex justify-center pt-8'>
 				<div className='max-w-screen-lg w-full'>
-					<div className='flex justify-between'>
+					<div className='flex justify-between mx-8'>
 						<div className='text-2xl font-bold text-slate-600'>
 							TaskFlow
 						</div>
