@@ -22,6 +22,7 @@ import '@xyflow/react/dist/style.css';
 import { Workflow, Zap } from 'lucide-react';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
 import { TriggerNode, ActionNode } from '../types/types';
+import { FlowModal } from '../components/FlowModel';
 
 const triggerNode = ({ data }: TriggerNode) => (
 	<div className='bg-yellow-100 p-4 rounded-lg border border-yellow-300'>
@@ -88,6 +89,8 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 export const Create = () => {
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 	const [edges, setEdges] = useState<Edge[]>(initialEdges);
+	const [isModelOpen, setIsModelOpen] = useState<boolean>(false);
+	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
 	const onNodesChange: OnNodesChange = useCallback(
 		(changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -105,12 +108,12 @@ export const Create = () => {
 	);
 
 	const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-		console.log('event', event);
-		console.log('click', node);
-		node.style = {
-			border: '2px solid rgb(81, 64, 191)',
-			borderRadius: '10px',
-		};
+		setSelectedNode(node);
+		setIsModelOpen(true);
+		// node.style = {
+		// 	border: '2px solid rgb(81, 64, 191)',
+		// 	borderRadius: '10px',
+		// };
 		setNodes((nds) => nds.map((n) => (n.id === node.id ? node : n)));
 	}, []);
 
@@ -166,6 +169,29 @@ export const Create = () => {
 						</PrimaryButton>
 					</div>
 				</Panel>
+				<FlowModal
+					isOpen={isModelOpen}
+					onClose={() => {
+						setIsModelOpen(false);
+						setSelectedNode(null);
+					}}
+					title={(selectedNode?.data.label as string) || 'Edit Node'}
+				>
+					<div className='space-y-4'>
+						<div>
+							<label className='block text-sm font-medium text-gray-700 mb-1'>
+								Label
+							</label>
+							<input
+								type='text'
+								className='w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+								defaultValue={
+									selectedNode?.data.label as string
+								}
+							/>
+						</div>
+					</div>
+				</FlowModal>
 			</ReactFlow>
 		</div>
 	);

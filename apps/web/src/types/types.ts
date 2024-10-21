@@ -1,10 +1,33 @@
 export type Task = {
 	id: number;
 	title: string;
-	description: string;
-	createdAt: string;
+	description?: string;
+	userId: string;
+	actions: {
+		id: string;
+		taskId: string;
+		metadata?: { [key: string]: string };
+		sortingOrder: number;
+		availableActionId: string;
+		availableAction: {
+			id: string;
+			name: string;
+			image: string;
+		};
+	}[];
+	trigger: {
+		id: string;
+		taskId: string;
+		metadata?: { [key: string]: string };
+		availableTriggerId: string;
+		availableTrigger: {
+			id: string;
+			name: string;
+			image: string;
+		};
+	};
 	updatedAt: string;
-	running: boolean;
+	running?: boolean;
 };
 
 export type SignUpUser = {
