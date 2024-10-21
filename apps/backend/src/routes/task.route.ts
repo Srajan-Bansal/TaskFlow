@@ -6,7 +6,7 @@ const router = Router();
 
 router.use(protect);
 
-router.get('/', taskController.getUserTasks);
+router.get('/getUserTasks', taskController.getUserTasks);
 router.get('/:id', taskController.getTask);
 router.post('/', taskController.createTask);
 

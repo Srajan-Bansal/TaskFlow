@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 type ErrorResponse = {
 	message: string;
 	statusCode: number;
@@ -19,5 +21,9 @@ export type TaskCreateSchema = {
 		actionMetaData?: JSON;
 	}[];
 };
+
+export interface AuthenticatedRequest extends Request {
+	user?: UserProfile;
+}
 
 export default ErrorResponse;
