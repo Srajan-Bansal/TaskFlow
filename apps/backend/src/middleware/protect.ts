@@ -3,9 +3,10 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import AppError from '../utils/appError';
 import catchAsync from '../utils/catchAsync';
+import { AuthenticatedRequest } from '../types/types';
 
 export const protect = catchAsync(
-	async (req: Request, res: Response, next: NextFunction) => {
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 		const token = req.cookies.authToken;
 		if (!token) {
 			return next(
@@ -38,7 +39,6 @@ export const protect = catchAsync(
 			);
 		}
 
-		// @ts-ignore
 		req.user = user;
 		next();
 	}

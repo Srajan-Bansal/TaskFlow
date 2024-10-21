@@ -2,36 +2,37 @@ import prisma from './../prisma';
 import { Request, Response, NextFunction } from 'express';
 import catchAsync from '../utils/catchAsync';
 import AppError from '../utils/appError';
-import { TaskCreateSchema } from '../types/types';
+import { TaskCreateSchema, AuthenticatedRequest } from '../types/types';
 
-export const getUserTasks = catchAsync(async (req: Request, res: Response) => {
-	// @ts-ignore
-	const id = req.user?.id;
+export const getUserTasks = catchAsync(
+	async (req: AuthenticatedRequest, res: Response) => {
+		console.log('id', req.user?.id);
+		const id = req.user?.id;
 
-	const tasks = await prisma.task.findMany({
-		where: {
-			userId: id,
-		},
-		include: {
-			actions: {
-				include: {
-					availableAction: true,
+		const tasks = await prisma.task.findMany({
+			where: {
+				userId: id,
+			},
+			include: {
+				actions: {
+					include: {
+						availableAction: true,
+					},
+				},
+				trigger: {
+					include: {
+						availableTrigger: true,
+					},
 				},
 			},
-			trigger: {
-				include: {
-					availableTrigger: true,
-				},
-			},
-		},
-	});
+		});
 
-	res.status(200).json(tasks);
-});
+		res.status(200).json(tasks);
+	}
+);
 
 export const getTask = catchAsync(
-	async (req: Request, res: Response, next: NextFunction) => {
-		// @ts-ignore
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 		const id = req.user?.id;
 		const taskId = req.params.id;
 
@@ -67,8 +68,7 @@ export const getTask = catchAsync(
 );
 
 export const createTask = catchAsync(
-	async (req: Request, res: Response, next: NextFunction) => {
-		// @ts-ignore
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 		const id = req.user?.id;
 		const body: TaskCreateSchema = req.body;
 
