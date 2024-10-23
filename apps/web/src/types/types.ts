@@ -2,32 +2,36 @@ export type Task = {
 	id: number;
 	title: string;
 	description?: string;
-	userId: string;
+	userId?: string;
 	actions: {
 		id: string;
 		taskId: string;
 		metadata?: { [key: string]: string };
 		sortingOrder: number;
 		availableActionId: string;
-		availableAction: {
-			id: string;
-			name: string;
-			image: string;
-		};
+		availableAction: availableAction;
 	}[];
 	trigger: {
 		id: string;
 		taskId: string;
 		metadata?: { [key: string]: string };
 		availableTriggerId: string;
-		availableTrigger: {
-			id: string;
-			name: string;
-			image: string;
-		};
+		availableTrigger: availableTrigger;
 	};
-	updatedAt: string;
+	updatedAt?: string;
 	running?: boolean;
+};
+
+export type availableAction = {
+	id: string;
+	name: string;
+	image: string;
+};
+
+export type availableTrigger = {
+	id: string;
+	name: string;
+	image: string;
 };
 
 export type SignUpUser = {
@@ -49,8 +53,14 @@ export type TriggerNode = {
 };
 
 export type ActionNode = {
+	id: string;
+	availableActionsId: string;
+	name: string;
+	metadata?: { [key: string]: string };
 	data: {
+		id: string;
 		label: string;
+		metadata?: { [key: string]: string };
 	};
 };
 
