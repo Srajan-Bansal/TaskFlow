@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Task } from '../types/types';
 import { ToggleSwitch } from './ToggleSwitch';
 import { HOOKS_URL } from './../config';
 
 export function TaskTable({ tasks }: { tasks: Task[] }) {
 	const [toggleEnable, setToggleEnable] = useState<boolean>(false);
+	const navigate = useNavigate();
 
 	function handleToggle() {
 		setToggleEnable(!toggleEnable);
@@ -25,11 +27,12 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
 				tasks.map((task) => (
 					<div
 						key={task.id}
-						className='flex border-b border-t py-4 items-center'
+						className='flex border-b border-t py-4 items-center cursor-pointer hover:bg-gray-100'
+						onClick={() => navigate(`/app/task/${task.id}`)}
 					>
 						<div className='w-1/5 flex'>
 							<img
-								className='w-[30px] h-[30px]'
+								className='w-6 h-6 rounded-lg'
 								key={task.id}
 								src={task.trigger.availableTrigger.image}
 								alt={task.trigger.availableTrigger.name}

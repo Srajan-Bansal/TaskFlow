@@ -88,8 +88,8 @@ export const createTask = catchAsync(
 					triggerId: '',
 					actions: {
 						create: body.actions.map((action, index) => ({
-							availableActionId: action.availableActionId,
-							actionMetaData: action.actionMetaData,
+							availableActionsId: action.availableActionId,
+							metadata: action.metaData || {},
 							sortingOrder: index,
 						})),
 					},

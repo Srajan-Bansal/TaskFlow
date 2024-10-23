@@ -1,25 +1,28 @@
 import { X } from 'lucide-react';
+import { availableAction, availableTrigger } from '../types/types';
 
 export function FlowModal({
 	isOpen,
 	onClose,
-	title = 'Edit Node',
-	children,
+	selectedNode,
+	availableItems,
+	onSelectItem,
 }: {
 	isOpen: boolean;
 	onClose: () => void;
-	title?: string;
-	children: React.ReactNode;
+	selectedNode: 'action' | 'trigger';
+	availableItems: availableAction[] | availableTrigger[];
+	onSelectItem: (item: availableAction | availableTrigger) => void;
 }) {
 	if (!isOpen) return null;
 
 	return (
 		<div className='fixed inset-0 bg-black/50 z-50 flex items-center justify-center'>
 			<div className='bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
-				{/* Header */}
 				<div className='flex items-center justify-between p-4 border-b'>
 					<h3 className='text-lg font-semibold text-gray-900'>
-						{title}
+						Select{' '}
+						{selectedNode === 'action' ? 'Action' : 'Trigger'}
 					</h3>
 					<button
 						onClick={onClose}
@@ -29,10 +32,23 @@ export function FlowModal({
 					</button>
 				</div>
 
-				{/* Content */}
-				<div className='p-4'>{children}</div>
+				<div className='p-4 space-y-4'>
+					{availableItems.map((item) => (
+						<div
+							key={item.id}
+							className='flex items-center gap-3 p-2 border rounded-lg hover:bg-gray-50'
+							onClick={() => onSelectItem(item)}
+						>
+							<img
+								src={item.image}
+								alt={item.name}
+								className='w-10 h-10 rounded-lg'
+							/>
+							<div>{item.name}</div>
+						</div>
+					))}
+				</div>
 
-				{/* Footer */}
 				<div className='flex justify-end gap-3 p-4 border-t'>
 					<button
 						onClick={onClose}

@@ -15,10 +15,10 @@ export type UserProfile = {
 export type TaskCreateSchema = {
 	title?: string;
 	availableTriggerId: string;
-	triggerMetaData?: JSON;
+	metaData?: JSON;
 	actions: {
 		availableActionId: string;
-		actionMetaData?: JSON;
+		metaData?: JSON;
 	}[];
 };
 

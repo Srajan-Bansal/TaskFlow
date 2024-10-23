@@ -63,7 +63,7 @@ const App = () => {
 					}
 				/>
 				<Route
-					path='/app/create'
+					path='/app/task/:id'
 					element={
 						<ProtectedRoute>
 							<Create />
