@@ -1,9 +1,5 @@
-<<<<<<< Updated upstream
-import { useState, useCallback } from 'react';
-=======
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
->>>>>>> Stashed changes
 import {
 	ReactFlow,
 	MiniMap,
@@ -27,9 +23,6 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Workflow, Zap } from 'lucide-react';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
-<<<<<<< Updated upstream
-import { TriggerNode, ActionNode } from '../types/types';
-=======
 import {
 	TriggerNode,
 	ActionNode,
@@ -37,7 +30,6 @@ import {
 	availableTrigger,
 	NodeConnection,
 } from '../types/types';
->>>>>>> Stashed changes
 import { FlowModal } from '../components/FlowModel';
 import { useAvailableActionsAndTriggers } from '../hooks/useAvailableActoinsAndTriggers';
 import { createTask, getTask } from '../lib/api';
@@ -110,15 +102,12 @@ export const Create = () => {
 	const [edges, setEdges] = useState<Edge[]>(initialEdges);
 	const [isModelOpen, setIsModelOpen] = useState<boolean>(false);
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-<<<<<<< Updated upstream
-=======
 	const { availableActions, availableTriggers } =
 		useAvailableActionsAndTriggers();
 	const [nodeConnectionsMap, setNodeConnectionsMap] =
 		useState<NodeConnection>({});
 	const { id } = useParams();
 	const navigate = useNavigate();
->>>>>>> Stashed changes
 
 	const onNodesChange: OnNodesChange = useCallback(
 		(changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -182,114 +171,6 @@ export const Create = () => {
 		setNodes((nds) => [...nds, newNode]);
 	}, [nodes]);
 
-	const handleSelectItem = useCallback(
-		(item: availableAction | availableTrigger) => {
-			setNodes((nds) =>
-				nds.map((node) =>
-					node.id === selectedNode?.id
-						? {
-								...node,
-								data: {
-									...node.data,
-									id: item.id,
-									label: item.name,
-								},
-							}
-						: node
-				)
-			);
-
-			setIsModelOpen(false);
-		},
-		[selectedNode]
-	);
-
-	const publishWorkflow = async () => {
-		try {
-			const triggerNode = nodes.find((node) => node.type === 'trigger');
-			const actionNodes = nodes.filter((node) => node.type === 'action');
-
-			if (!triggerNode || actionNodes.length === 0) {
-				showErrorToast(
-					'Workflow must have at least one trigger and action.'
-				);
-				return;
-			}
-
-			const task = {
-				availableTriggerId: triggerNode.data.id,
-				availableTrigger: availableTriggers.find(
-					(trigger) => trigger.id === triggerNode.data.id
-				),
-				actions: actionNodes.map((action, index) => ({
-					availableActionId: action.data.id,
-					sortingOrder: index,
-					actionMetaData: action.data.metadata || {},
-				})),
-			};
-
-			console.log(task);
-			await createTask(task);
-		} catch (error) {
-			showErrorToast('Failed to create workflow');
-		}
-	};
-
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const res = await getTask(id as string);
-				console.log(res);
-
-				if (res) {
-					// Create the trigger node based on the response
-					const triggerNode: Node = {
-						id: res.triggerId,
-						type: 'trigger',
-						position: { x: 250, y: 50 },
-						data: {
-							id: res.trigger.availableTrigger.id,
-							label: res.trigger.availableTrigger.name, // Corrected 'nam' to 'name'
-						},
-					};
-
-					// Create action nodes from the response actions
-					const actionNodes: Node[] = res.actions.map(
-						(action: ActionNode, index: number) => ({
-							id: action.id, // Ensure this is a unique identifier
-							type: 'action',
-							position: { x: 250, y: 200 + index * 150 }, // Adjust positioning as needed
-							data: {
-								id: action.availableActionsId,
-								label: action.name || 'New Action', // Default label if name is missing
-								metadata: action.metadata || {}, // Default to empty object if metadata is missing
-							},
-						})
-					);
-
-					// Create edges connecting trigger and action nodes
-					const edges: Edge[] = actionNodes.map((actionNode) => ({
-						id: `e-${triggerNode.id}-${actionNode.id}`,
-						source: triggerNode.id,
-						target: actionNode.id,
-						animated: true,
-					}));
-
-					// Set the nodes and edges into state
-					setNodes([triggerNode, ...actionNodes]);
-					setEdges(edges);
-				} else {
-					showErrorToast('No task data found');
-				}
-			} catch (error) {
-				showErrorToast('Failed to fetch task');
-			}
-		};
-		fetchData();
-	}, [id]);
-
-<<<<<<< Updated upstream
-=======
 	const handleSelectItem = useCallback(
 		(item: availableAction | availableTrigger) => {
 			setNodes((nds) =>
@@ -405,7 +286,6 @@ export const Create = () => {
 		fetchData();
 	}, [id]);
 
->>>>>>> Stashed changes
 	return (
 		<div className='w-full h-[800px] relative'>
 			<ReactFlow
