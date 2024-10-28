@@ -6,7 +6,6 @@ import { TaskCreateSchema, AuthenticatedRequest } from '../types/types';
 
 export const getUserTasks = catchAsync(
 	async (req: AuthenticatedRequest, res: Response) => {
-		console.log('id', req.user?.id);
 		const id = req.user?.id;
 
 		const tasks = await prisma.task.findMany({
@@ -114,5 +113,53 @@ export const createTask = catchAsync(
 		});
 
 		res.status(201).json(taskId);
+	}
+);
+
+export const deleteTask = catchAsync(
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+		const taskId = req.params.id;
+
+		if (taskId) {
+			return next(
+				new AppError({
+					statusCode: 401,
+					message: 'Id is required',
+				})
+			);
+		}
+
+		await prisma.task.delete({
+			where: {
+				id: taskId,
+			},
+		});
+
+		res.status(200).json('Task Deleted');
+	}
+);
+
+export const updateTask = catchAsync(
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+		const taskId = req.params.id;
+		const body = req.body;
+
+		if (!taskId) {
+			return next(
+				new AppError({
+					statusCode: 401,
+					message: 'Id is required',
+				})
+			);
+		}
+
+		const task = await prisma.task.update({
+			where: {
+				id: taskId,
+			},
+			data: body,
+		});
+
+		res.status(200).json(task);
 	}
 );
