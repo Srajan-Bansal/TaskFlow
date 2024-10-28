@@ -1,5 +1,5 @@
 export type Task = {
-	id: number;
+	id: string;
 	title: string;
 	description?: string;
 	userId?: string;
@@ -18,7 +18,7 @@ export type Task = {
 		availableTriggerId: string;
 		availableTrigger: availableTrigger;
 	};
-	updatedAt?: string;
+	LastRunnedAt?: Date;
 	running?: boolean;
 };
 
@@ -55,12 +55,20 @@ export type TriggerNode = {
 export type ActionNode = {
 	id: string;
 	availableActionsId: string;
+	availableAction: availableAction;
 	name: string;
 	metadata?: { [key: string]: string };
 	data: {
 		id: string;
 		label: string;
 		metadata?: { [key: string]: string };
+	};
+};
+
+export type NodeConnection = {
+	[key: string]: {
+		incoming: number;
+		outgoing: number;
 	};
 };
 

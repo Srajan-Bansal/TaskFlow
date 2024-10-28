@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { BACKEND_URL } from '../config';
-import { SignUpUser, SignInUser, Task } from '../types/types';
+import { SignUpUser, SignInUser } from '../types/types';
 
 export const getAllTasks = async () => {
 	const res = await axios.get(`${BACKEND_URL}/api/v1/task/getUserTasks`, {
 		withCredentials: true,
 	});
 
+	console.log(res.data);
 	return res.data;
 };
 
@@ -51,7 +52,6 @@ export const verifyUser = async () => {
 
 	return res.data;
 };
-
 export const getAvailableTriggers = async () => {
 	const res = await axios.get(
 		`${BACKEND_URL}/api/v1/trigger/availableTriggers`,
@@ -84,6 +84,22 @@ export const createTask = async (task: any) => {
 
 export const getTask = async (id: string) => {
 	const res = await axios.get(`${BACKEND_URL}/api/v1/task/${id}`, {
+		withCredentials: true,
+	});
+
+	return res.data;
+};
+
+export const deleteTask = async (id: string) => {
+	const res = await axios.delete(`${BACKEND_URL}/api/v1/task/${id}`, {
+		withCredentials: true,
+	});
+
+	return res.data;
+};
+
+export const updateTask = async (id: string, data: unknown) => {
+	const res = await axios.patch(`${BACKEND_URL}/api/v1/task/${id}`, data, {
 		withCredentials: true,
 	});
 

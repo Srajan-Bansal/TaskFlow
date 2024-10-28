@@ -32,6 +32,8 @@ model Task {
   actions     Action[]
   taskRuns    TaskRun[]
   triggerId   String
+  Running     Boolean   @default(false)
+  LastRunedAt DateTime?
 }
 
 model Trigger {
