@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
 	ReactFlow,
 	MiniMap,
@@ -18,6 +18,7 @@ import {
 	type Node,
 	type Edge,
 	BackgroundVariant,
+	Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Workflow, Zap } from 'lucide-react';
@@ -27,6 +28,7 @@ import {
 	ActionNode,
 	availableAction,
 	availableTrigger,
+	NodeConnection,
 } from '../types/types';
 import { FlowModal } from '../components/FlowModel';
 import { useAvailableActionsAndTriggers } from '../hooks/useAvailableActoinsAndTriggers';
@@ -73,13 +75,13 @@ const initialNodes: Node[] = [
 		id: '1',
 		type: 'trigger',
 		position: { x: 250, y: 50 },
-		data: { label: 'When new email arrives' },
+		data: { label: 'Add Trigger' },
 	},
 	{
 		id: '2',
 		type: 'action',
 		position: { x: 250, y: 200 },
-		data: { label: 'Send Slack message' },
+		data: { label: 'Add Action' },
 	},
 ];
 
@@ -102,7 +104,10 @@ export const Create = () => {
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 	const { availableActions, availableTriggers } =
 		useAvailableActionsAndTriggers();
+	const [nodeConnectionsMap, setNodeConnectionsMap] =
+		useState<NodeConnection>({});
 	const { id } = useParams();
+	const navigate = useNavigate();
 
 	const onNodesChange: OnNodesChange = useCallback(
 		(changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -115,8 +120,37 @@ export const Create = () => {
 	);
 
 	const onConnect: OnConnect = useCallback(
-		(connection) => setEdges((eds) => addEdge(connection, eds)),
-		[setEdges]
+		(params: Connection) => {
+			const { source, target } = params;
+			setNodeConnectionsMap((prev) => ({
+				...prev,
+				[source]: prev[source] || { incoming: 0, outgoing: 0 },
+				[target]: prev[target] || { incoming: 0, outgoing: 0 },
+			}));
+
+			if (
+				nodeConnectionsMap[source]?.outgoing >= 1 ||
+				nodeConnectionsMap[target]?.incoming >= 1
+			) {
+				showErrorToast('Each node can only have 1 parent and 1 child');
+				return;
+			}
+
+			setNodeConnectionsMap((prev) => ({
+				...prev,
+				[source]: {
+					...prev[source],
+					outgoing: prev[source].outgoing + 1,
+				},
+				[target]: {
+					...prev[target],
+					incoming: prev[target].incoming + 1,
+				},
+			}));
+
+			setEdges((eds) => addEdge(params, eds));
+		},
+		[nodeConnectionsMap, setEdges]
 	);
 
 	const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
@@ -129,8 +163,8 @@ export const Create = () => {
 			id: `action-${nodes.length + 1}`,
 			type: 'action',
 			position: {
-				x: Math.random() * 500,
-				y: Math.random() * 300,
+				x: nodes[nodes.length - 1].position.x,
+				y: nodes[nodes.length - 1].position.y + 150,
 			},
 			data: { label: 'New Action' },
 		};
@@ -183,8 +217,8 @@ export const Create = () => {
 				})),
 			};
 
-			console.log(task);
 			await createTask(task);
+			navigate('/app/home');
 		} catch (error) {
 			showErrorToast('Failed to create workflow');
 		}
@@ -197,40 +231,49 @@ export const Create = () => {
 				console.log(res);
 
 				if (res) {
-					// Create the trigger node based on the response
 					const triggerNode: Node = {
 						id: res.triggerId,
 						type: 'trigger',
 						position: { x: 250, y: 50 },
 						data: {
 							id: res.trigger.availableTrigger.id,
-							label: res.trigger.availableTrigger.name, // Corrected 'nam' to 'name'
+							label: res.trigger.availableTrigger.name,
 						},
 					};
 
-					// Create action nodes from the response actions
 					const actionNodes: Node[] = res.actions.map(
 						(action: ActionNode, index: number) => ({
-							id: action.id, // Ensure this is a unique identifier
+							id: action.id,
 							type: 'action',
-							position: { x: 250, y: 200 + index * 150 }, // Adjust positioning as needed
+							position: { x: 250, y: 200 + index * 150 },
 							data: {
 								id: action.availableActionsId,
-								label: action.name || 'New Action', // Default label if name is missing
-								metadata: action.metadata || {}, // Default to empty object if metadata is missing
+								label: action.availableAction.name,
+								metadata: action.metadata || {},
 							},
 						})
 					);
 
-					// Create edges connecting trigger and action nodes
-					const edges: Edge[] = actionNodes.map((actionNode) => ({
-						id: `e-${triggerNode.id}-${actionNode.id}`,
-						source: triggerNode.id,
-						target: actionNode.id,
-						animated: true,
-					}));
+					const edges: Edge[] = actionNodes.map(
+						(actionNode, index) => {
+							if (index === 0) {
+								return {
+									id: `e-${triggerNode.id}-${actionNode.id}`,
+									source: triggerNode.id,
+									target: actionNode.id,
+									animated: true,
+								};
+							} else {
+								return {
+									id: `e-${actionNodes[index - 1].id}-${actionNode.id}`,
+									source: actionNodes[index - 1].id,
+									target: actionNode.id,
+									animated: true,
+								};
+							}
+						}
+					);
 
-					// Set the nodes and edges into state
 					setNodes([triggerNode, ...actionNodes]);
 					setEdges(edges);
 				} else {

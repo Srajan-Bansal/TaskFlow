@@ -70,6 +70,14 @@ const App = () => {
 						</ProtectedRoute>
 					}
 				/>
+				<Route
+					path='/app/create'
+					element={
+						<ProtectedRoute>
+							<Create />
+						</ProtectedRoute>
+					}
+				/>
 			</Route>
 		)
 	);
