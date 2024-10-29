@@ -120,7 +120,7 @@ export const deleteTask = catchAsync(
 	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 		const taskId = req.params.id;
 
-		if (taskId) {
+		if (!taskId) {
 			return next(
 				new AppError({
 					statusCode: 401,
