@@ -19,7 +19,7 @@ export type Task = {
 		availableTrigger: availableTrigger;
 	};
 	LastRunnedAt?: Date;
-	running?: boolean;
+	Running: boolean;
 };
 
 export type availableAction = {

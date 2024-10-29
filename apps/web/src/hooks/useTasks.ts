@@ -26,5 +26,5 @@ export const useTasks = () => {
 		fetchTasks();
 	}, []);
 
-	return { tasks, loading, error };
+	return { tasks, loading, error, setTasks };
 };
