@@ -36,7 +36,7 @@ export function FlowModal({
 					{availableItems.map((item) => (
 						<div
 							key={item.id}
-							className='flex items-center gap-3 p-2 border rounded-lg hover:bg-gray-50'
+							className='flex items-center gap-3 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer'
 							onClick={() => onSelectItem(item)}
 						>
 							<img

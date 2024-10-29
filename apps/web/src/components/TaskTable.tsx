@@ -1,35 +1,22 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from '../types/types';
 import { ToggleSwitch } from './ToggleSwitch';
 import { HOOKS_URL } from './../config';
 import { Trash2 } from 'lucide-react';
-import { deleteTask, updateTask } from '../lib/api';
-import { showErrorToast, showSuccessToast } from '../lib/toaster';
 
-export function TaskTable({ tasks }: { tasks: Task[] }) {
-	const [toggleEnable, setToggleEnable] = useState<boolean>(false);
+export function TaskTable({
+	tasks,
+	handleDeleteTask,
+	handleToggleTask,
+}: {
+	tasks: Task[];
+	handleDeleteTask: (id: string) => void;
+	handleToggleTask: (id: string, updates: Partial<Task>) => void;
+}) {
 	const navigate = useNavigate();
 
-	async function handleToggle(id: string) {
-		try {
-			await updateTask(id, {
-				Running: !toggleEnable,
-			});
-			setToggleEnable(!toggleEnable);
-			showSuccessToast('Task is Live Now');
-		} catch (err) {
-			showErrorToast('Please Try Again Later!!');
-		}
-	}
-
-	async function handleDeleteTask(id: string) {
-		try {
-			await deleteTask(id);
-			showSuccessToast('Task Deleted successfully');
-		} catch (err) {
-			showErrorToast('Task Cannot be deleted');
-		}
+	function handleToggle(task: Task) {
+		handleToggleTask(task.id, { Running: !task.Running });
 	}
 
 	return (
@@ -85,10 +72,12 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
 								: 'No run'}
 						</div>
 						<div className='w-[10%]'>
-							{/* {task.running ? 'Yes' : 'No'} */}
 							<ToggleSwitch
-								toggleEnable={toggleEnable}
-								onClick={() => handleToggle(task.id)}
+								toggleEnable={task.Running}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleToggle(task);
+								}}
 							/>
 						</div>
 						<div className='w-[30%] truncate hover:text-clip hover:overflow-visible'>

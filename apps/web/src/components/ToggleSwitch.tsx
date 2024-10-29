@@ -3,7 +3,7 @@ export function ToggleSwitch({
 	onClick,
 }: {
 	toggleEnable: boolean;
-	onClick: () => void;
+	onClick: (e: React.MouseEvent) => void;
 }) {
 	return (
 		<button
