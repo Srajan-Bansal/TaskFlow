@@ -32,10 +32,10 @@ import {
 } from '../types/types';
 import { FlowModal } from '../components/FlowModel';
 import { useAvailableActionsAndTriggers } from '../hooks/useAvailableActoinsAndTriggers';
-import { createTask, getTask } from '../lib/api';
+import { createTask, getTask, updateTask } from '../lib/api';
 import { showErrorToast } from '../lib/toaster';
 
-const triggerNode = ({ data }: TriggerNode) => (
+const triggerNode = ({ data }: { data: TriggerNode['data'] }) => (
 	<div className='bg-yellow-100 p-4 rounded-lg border border-yellow-300'>
 		<Handle
 			type='source'
@@ -207,9 +207,7 @@ export const Create = () => {
 
 			const task = {
 				availableTriggerId: triggerNode.data.id,
-				availableTrigger: availableTriggers.find(
-					(trigger) => trigger.id === triggerNode.data.id
-				),
+				triggerMetaData: triggerNode.data.metadata || {},
 				actions: actionNodes.map((action, index) => ({
 					availableActionId: action.data.id,
 					sortingOrder: index,
@@ -217,7 +215,11 @@ export const Create = () => {
 				})),
 			};
 
-			await createTask(task);
+			if (id) {
+				await updateTask(id, task);
+			} else {
+				await createTask(task);
+			}
 			navigate('/app/home');
 		} catch (error) {
 			showErrorToast('Failed to create workflow');
