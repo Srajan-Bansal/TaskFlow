@@ -142,24 +142,65 @@ export const deleteTask = catchAsync(
 export const updateTask = catchAsync(
 	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 		const taskId = req.params.id;
-		const body = req.body;
 
 		if (!taskId) {
 			return next(
 				new AppError({
 					statusCode: 401,
-					message: 'Id is required',
+					message: 'Task ID is required',
 				})
 			);
 		}
 
-		const task = await prisma.task.update({
-			where: {
-				id: taskId,
-			},
-			data: body,
+		const { availableTriggerId, triggerMetaData, actions } = req.body;
+
+		const updatedTask = await prisma.$transaction(async (tx) => {
+			const task = await tx.task.update({
+				where: {
+					id: taskId,
+				},
+				data: {
+					triggerId: '',
+				},
+			});
+
+			const trigger = await tx.trigger.update({
+				where: {
+					taskId: taskId,
+				},
+				data: {
+					availableTriggersId: availableTriggerId,
+					metadata: triggerMetaData,
+				},
+			});
+
+			await tx.task.update({
+				where: {
+					id: taskId,
+				},
+				data: {
+					triggerId: trigger.id,
+				},
+			});
+
+			await tx.action.deleteMany({
+				where: {
+					taskId: taskId,
+				},
+			});
+
+			await tx.action.createMany({
+				data: actions.map((action) => ({
+					taskId: taskId,
+					availableActionsId: action.availableActionId,
+					metadata: action.metaData || {},
+					sortingOrder: action.sortingOrder,
+				})),
+			});
+
+			return task;
 		});
 
-		res.status(200).json(task);
+		res.status(200).json(updatedTask);
 	}
 );
