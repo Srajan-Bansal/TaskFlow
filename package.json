@@ -1,12 +1,12 @@
 {
-	"name": "srajan",
+	"name": "taskflow",
 	"private": true,
 	"scripts": {
-		"build": "turbo build",
-		"dev": "turbo dev",
-		"lint": "turbo lint",
-		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
-		"dev:web": "turbo run dev --filter=web --filter=backend --filter=./packages/ui"
+		"build": "pnpm turbo build",
+		"dev": "pnpm turbo dev",
+		"lint": "pnpm turbo lint",
+		"format": "pnpm prettier --write \"**/*.{ts,tsx,md}\"",
+		"dev:web": "pnpm turbo run dev --filter=web --filter=backend --filter=./packages/ui"
 	},
 	"devDependencies": {
 		"prettier": "^3.2.5",
@@ -16,9 +16,5 @@
 	"engines": {
 		"node": ">=18"
 	},
-	"packageManager": "npm@10.9.0",
-	"workspaces": [
-		"apps/*",
-		"packages/*"
-	]
+	"packageManager": "pnpm@9.0.6"
 }

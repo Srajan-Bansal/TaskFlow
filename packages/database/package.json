@@ -2,10 +2,10 @@
 	"name": "@repo/db",
 	"version": "0.0.0",
 	"scripts": {
-		"db:generate": "prisma generate",
-		"db:push": "prisma db push --skip-generate",
-		"seed": "node src/seed.ts"
-	},
+        "db:generate": "pnpm prisma generate",
+        "db:push": "pnpm prisma db push --skip-generate",
+        "seed": "pnpm node src/seed.ts"
+    },
 	"dependencies": {
 		"@prisma/client": "^5.20.0"
 	},
