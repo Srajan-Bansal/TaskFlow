@@ -11,9 +11,9 @@
 		"./Spinner": "./src/Spinner.tsx"
 	},
 	"scripts": {
-		"lint": "eslint . --max-warnings 0",
-		"generate:component": "turbo gen react-component"
-	},
+        "lint": "pnpm eslint . --max-warnings 0",
+        "generate:component": "pnpm turbo gen react-component"
+    },
 	"devDependencies": {
 		"@repo/eslint-config": "*",
 		"@repo/typescript-config": "*",
