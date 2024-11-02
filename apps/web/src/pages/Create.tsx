@@ -31,6 +31,7 @@ import {
 	NodeConnection,
 } from '../types/types';
 import { FlowModal } from '../components/FlowModel';
+import { SideModel } from '../components/SideModel';
 import { useAvailableActionsAndTriggers } from '../hooks/useAvailableActoinsAndTriggers';
 import { createTask, getTask, updateTask } from '../lib/api';
 import { showErrorToast } from '../lib/toaster';
@@ -102,10 +103,11 @@ export const Create = () => {
 	const [edges, setEdges] = useState<Edge[]>(initialEdges);
 	const [isModelOpen, setIsModelOpen] = useState<boolean>(false);
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-	const { availableActions, availableTriggers } =
-		useAvailableActionsAndTriggers();
+	// const { availableActions, availableTriggers } =
+	// 	useAvailableActionsAndTriggers();
 	const [nodeConnectionsMap, setNodeConnectionsMap] =
 		useState<NodeConnection>({});
+
 	const { id } = useParams();
 	const navigate = useNavigate();
 
@@ -159,7 +161,7 @@ export const Create = () => {
 	}, []);
 
 	const addActionNode = useCallback(() => {
-		const newNode: Node = {
+		const newActionNode: Node = {
 			id: `action-${nodes.length + 1}`,
 			type: 'action',
 			position: {
@@ -168,11 +170,21 @@ export const Create = () => {
 			},
 			data: { label: 'New Action' },
 		};
-		setNodes((nds) => [...nds, newNode]);
-	}, [nodes]);
+
+		const newEdge: Edge = {
+			id: `e-${nodes[nodes.length - 1]}-${newActionNode.id}`,
+			source: nodes[nodes.length - 1].id,
+			target: newActionNode.id,
+			animated: true,
+		};
+
+		setNodes((nds) => [...nds, newActionNode]);
+		setEdges((eds) => [...eds, newEdge]);
+	}, [nodes, edges]);
 
 	const handleSelectItem = useCallback(
 		(item: availableAction | availableTrigger) => {
+			console.log(item);
 			setNodes((nds) =>
 				nds.map((node) =>
 					node.id === selectedNode?.id
@@ -340,6 +352,7 @@ export const Create = () => {
 					</div>
 				</Panel>
 
+				{/* 
 				<FlowModal
 					isOpen={isModelOpen}
 					onClose={() => {
@@ -353,8 +366,17 @@ export const Create = () => {
 							: availableTriggers
 					}
 					onSelectItem={handleSelectItem}
-				/>
+				/> */}
 			</ReactFlow>
+
+			<SideModel
+				isOpen={isModelOpen}
+				onClose={() => {
+					setIsModelOpen(false);
+				}}
+				selectedNode={selectedNode}
+				onSelectItem={handleSelectItem}
+			/>
 		</div>
 	);
 };

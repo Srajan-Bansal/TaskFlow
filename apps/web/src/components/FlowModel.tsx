@@ -2,20 +2,16 @@ import { X } from 'lucide-react';
 import { availableAction, availableTrigger } from '../types/types';
 
 export function FlowModal({
-	isOpen,
 	onClose,
 	selectedNode,
 	availableItems,
 	onSelectItem,
 }: {
-	isOpen: boolean;
 	onClose: () => void;
 	selectedNode: 'action' | 'trigger';
 	availableItems: availableAction[] | availableTrigger[];
 	onSelectItem: (item: availableAction | availableTrigger) => void;
 }) {
-	if (!isOpen) return null;
-
 	return (
 		<div className='fixed inset-0 bg-black/50 z-50 flex items-center justify-center'>
 			<div className='bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
