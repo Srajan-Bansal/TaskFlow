@@ -33,7 +33,10 @@ export function FlowModal({
 						<div
 							key={item.id}
 							className='flex items-center gap-3 p-2 border rounded-lg hover:bg-gray-100 cursor-pointer'
-							onClick={() => onSelectItem(item)}
+							onClick={() => {
+								onSelectItem(item);
+								onClose();
+							}}
 						>
 							<img
 								src={item.image}
@@ -43,21 +46,6 @@ export function FlowModal({
 							<div>{item.name}</div>
 						</div>
 					))}
-				</div>
-
-				<div className='flex justify-end gap-3 p-4 border-t'>
-					<button
-						onClick={onClose}
-						className='px-4 py-2 text-sm border rounded-lg hover:bg-gray-50'
-					>
-						Cancel
-					</button>
-					<button
-						onClick={onClose}
-						className='px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700'
-					>
-						Save Changes
-					</button>
 				</div>
 			</div>
 		</div>

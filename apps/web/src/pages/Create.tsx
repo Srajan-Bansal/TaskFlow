@@ -103,8 +103,6 @@ export const Create = () => {
 	const [edges, setEdges] = useState<Edge[]>(initialEdges);
 	const [isModelOpen, setIsModelOpen] = useState<boolean>(false);
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-	// const { availableActions, availableTriggers } =
-	// 	useAvailableActionsAndTriggers();
 	const [nodeConnectionsMap, setNodeConnectionsMap] =
 		useState<NodeConnection>({});
 
@@ -184,7 +182,6 @@ export const Create = () => {
 
 	const handleSelectItem = useCallback(
 		(item: availableAction | availableTrigger) => {
-			console.log(item);
 			setNodes((nds) =>
 				nds.map((node) =>
 					node.id === selectedNode?.id
@@ -199,8 +196,6 @@ export const Create = () => {
 						: node
 				)
 			);
-
-			setIsModelOpen(false);
 		},
 		[selectedNode]
 	);
@@ -301,7 +296,27 @@ export const Create = () => {
 	}, [id]);
 
 	return (
-		<div className='w-full h-[800px] relative'>
+		<div className='w-full h-[700px] relative'>
+			<div className='bg-slate-100 p-2 rounded-t-lg shadow-lg flex mx-4 gap-5'>
+				<div className='flex gap-2'>
+					<PrimaryButton
+						onClick={addActionNode}
+						className='flex items-center gap-2'
+					>
+						<Workflow className='w-4 h-4' />
+						Add Action
+					</PrimaryButton>
+				</div>
+
+				<div className='flex gap-2'>
+					<PrimaryButton
+						onClick={publishWorkflow}
+						className='flex items-center gap-2'
+					>
+						Publish Workflow
+					</PrimaryButton>
+				</div>
+			</div>
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
@@ -324,49 +339,6 @@ export const Create = () => {
 				/>
 				<Controls className='absolute top-2 left-2' />
 				<MiniMap className='absolute bottom-2 left-2 ml-12 w-[200px]' />
-
-				<Panel
-					position='top-right'
-					className='bg-white p-2 rounded-t-lg shadow-lg'
-				>
-					<PrimaryButton
-						onClick={publishWorkflow}
-						className='flex items-center gap-2'
-					>
-						Publish Workflow
-					</PrimaryButton>
-				</Panel>
-
-				<Panel
-					position='bottom-center'
-					className='bg-white p-2 rounded-t-lg shadow-lg'
-				>
-					<div className='flex gap-2'>
-						<PrimaryButton
-							onClick={addActionNode}
-							className='flex items-center gap-2'
-						>
-							<Workflow className='w-4 h-4' />
-							Add Action
-						</PrimaryButton>
-					</div>
-				</Panel>
-
-				{/* 
-				<FlowModal
-					isOpen={isModelOpen}
-					onClose={() => {
-						setIsModelOpen(false);
-						setSelectedNode(null);
-					}}
-					selectedNode={selectedNode?.type as 'action' | 'trigger'}
-					availableItems={
-						selectedNode?.type === 'action'
-							? availableActions
-							: availableTriggers
-					}
-					onSelectItem={handleSelectItem}
-				/> */}
 			</ReactFlow>
 
 			<SideModel
