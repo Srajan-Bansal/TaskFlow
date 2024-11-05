@@ -11,5 +11,6 @@ router.get('/:id', taskController.getTask);
 router.post('/', taskController.createTask);
 router.delete('/:id', taskController.deleteTask);
 router.patch('/:id', taskController.updateTask);
+router.patch('/:id/toggleRunning', taskController.toggleRunning);
 
 export const taskRouter = router;

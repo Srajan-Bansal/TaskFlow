@@ -47,8 +47,14 @@ export type SignInUser = {
 };
 
 export type TriggerNode = {
+	id: string;
+	availableTriggersId: string;
+	availableTrigger: availableTrigger;
+	metadata?: { [key: string]: string };
 	data: {
+		id: string;
 		label: string;
+		metadata?: { [key: string]: string };
 	};
 };
 

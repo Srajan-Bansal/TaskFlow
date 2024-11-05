@@ -104,3 +104,15 @@ export const updateTask = async (id: string, data: unknown) => {
 
 	return res.data;
 };
+
+export const toggleTaskRunning = async (id: string, isOff: boolean) => {
+	const res = await axios.patch(
+		`${BACKEND_URL}/api/v1/task/${id}/toggleRunning`,
+		isOff,
+		{
+			withCredentials: true,
+		}
+	);
+
+	return res.data;
+};
