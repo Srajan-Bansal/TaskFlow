@@ -41,7 +41,12 @@ export const Header = () => {
 							</PrimaryButton>
 						</>
 					) : (
-						<ProfilePic initials={handleInitials()} />
+						<>
+							<LinkButton onClick={() => navigate('/app/home')}>
+								Home
+							</LinkButton>
+							<ProfilePic initials={handleInitials()} />
+						</>
 					)}
 				</div>
 			</div>

@@ -6,7 +6,7 @@ import { useTasks } from '../hooks/useTasks';
 import { showErrorToast, showSuccessToast } from '../lib/toaster';
 import { Plus } from 'lucide-react';
 import { TaskTable } from '../components/TaskTable';
-import { deleteTask, updateTask } from './../lib/api';
+import { deleteTask, toggleTaskRunning } from './../lib/api';
 import { Task } from '../types/types';
 
 export const Dashboard = () => {
@@ -32,7 +32,7 @@ export const Dashboard = () => {
 
 	async function handleUpdateTask(id: string, updates: Partial<Task>) {
 		try {
-			await updateTask(id, updates);
+			await toggleTaskRunning(id, updates.Running as boolean);
 			const updatedTasks = tasks.map((task) =>
 				task.id === id ? { ...task, ...updates } : task
 			);

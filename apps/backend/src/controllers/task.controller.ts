@@ -204,3 +204,21 @@ export const updateTask = catchAsync(
 		res.status(200).json(updatedTask);
 	}
 );
+
+export const toggleRunning = catchAsync(
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+		const taskId = req.params.id;
+		const { isOff } = req.body;
+
+		const task = await prisma.task.update({
+			where: {
+				id: taskId,
+			},
+			data: {
+				Running: isOff,
+			},
+		});
+
+		res.status(200).json(task);
+	}
+);

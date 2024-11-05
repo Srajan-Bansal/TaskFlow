@@ -4,11 +4,11 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "tsc -b && vite build",
-		"lint": "eslint .",
-		"preview": "vite preview"
-	},
+        "dev": "pnpm vite",
+        "build": "pnpm tsc -b && pnpm vite build",
+        "lint": "pnpm eslint .",
+        "preview": "pnpm vite preview"
+    },
 	"dependencies": {
 		"@repo/ui": "*",
 		"@xyflow/react": "^12.3.2",

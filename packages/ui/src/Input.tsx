@@ -5,11 +5,13 @@ export const Input = ({
 	label,
 	required,
 	onChange = () => {},
+	placeholder,
 }: {
 	type: string;
 	label: string;
 	required?: boolean;
 	onChange?: ChangeEventHandler<HTMLInputElement>;
+	placeholder?: string;
 }) => (
 	<div className='flex flex-col justify-center space-y-4'>
 		<label
@@ -28,6 +30,7 @@ export const Input = ({
 			type={type}
 			required={required}
 			onChange={onChange}
+			placeholder={placeholder}
 		/>
 	</div>
 );
