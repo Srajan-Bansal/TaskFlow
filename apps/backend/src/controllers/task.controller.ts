@@ -5,8 +5,14 @@ import AppError from '../utils/appError';
 import { TaskCreateSchema, AuthenticatedRequest } from '../types/types';
 
 export const getUserTasks = catchAsync(
-	async (req: AuthenticatedRequest, res: Response) => {
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 		const id = req.user?.id;
+
+		if (!id) {
+			return next(
+				new AppError({ statusCode: 401, message: 'Unauthorized' })
+			);
+		}
 
 		const tasks = await prisma.task.findMany({
 			where: {
@@ -37,16 +43,14 @@ export const getTask = catchAsync(
 
 		if (!id) {
 			return next(
-				new AppError({
-					statusCode: 401,
-					message: 'Unauthorized',
-				})
+				new AppError({ statusCode: 401, message: 'Unauthorized' })
 			);
 		}
 
 		const task = await prisma.task.findFirst({
 			where: {
 				id: taskId,
+				userId: id,
 			},
 			include: {
 				trigger: {
@@ -62,6 +66,12 @@ export const getTask = catchAsync(
 			},
 		});
 
+		if (!task) {
+			return next(
+				new AppError({ statusCode: 404, message: 'Task not found' })
+			);
+		}
+
 		res.status(200).json(task);
 	}
 );
@@ -73,17 +83,15 @@ export const createTask = catchAsync(
 
 		if (!id) {
 			return next(
-				new AppError({
-					statusCode: 401,
-					message: 'Unauthorized',
-				})
+				new AppError({ statusCode: 401, message: 'Unauthorized' })
 			);
 		}
 
-		const taskId = await prisma.$transaction(async (tx) => {
-			const task = await tx.task.create({
+		const task = await prisma.$transaction(async (tx) => {
+			const createdTask = await tx.task.create({
 				data: {
 					userId: id,
+					title: body.title,
 					triggerId: '',
 					actions: {
 						create: body.actions.map((action, index) => ({
@@ -98,21 +106,23 @@ export const createTask = catchAsync(
 			const trigger = await tx.trigger.create({
 				data: {
 					availableTriggersId: body.availableTriggerId,
-					taskId: task.id,
+					taskId: createdTask.id,
 				},
 			});
 
 			await tx.task.update({
 				where: {
-					id: task.id,
+					id: createdTask.id,
 				},
 				data: {
 					triggerId: trigger.id,
 				},
 			});
+
+			return createdTask;
 		});
 
-		res.status(201).json(taskId);
+		res.status(201).json(task);
 	}
 );
 
@@ -124,8 +134,18 @@ export const deleteTask = catchAsync(
 			return next(
 				new AppError({
 					statusCode: 401,
-					message: 'Id is required',
+					message: 'Task ID is required',
 				})
+			);
+		}
+
+		const task = await prisma.task.findUnique({
+			where: { id: taskId },
+		});
+
+		if (!task) {
+			return next(
+				new AppError({ statusCode: 404, message: 'Task not found' })
 			);
 		}
 
@@ -146,7 +166,7 @@ export const updateTask = catchAsync(
 		if (!taskId) {
 			return next(
 				new AppError({
-					statusCode: 401,
+					statusCode: 400,
 					message: 'Task ID is required',
 				})
 			);
@@ -160,43 +180,41 @@ export const updateTask = catchAsync(
 					id: taskId,
 				},
 				data: {
-					triggerId: '',
+					// Assuming you might want to update the title and description as well
+					title: req.body.title,
+					description: req.body.description,
+					Running: req.body.Running, // Optional running state update
 				},
 			});
 
-			const trigger = await tx.trigger.update({
-				where: {
-					taskId: taskId,
-				},
-				data: {
-					availableTriggersId: availableTriggerId,
-					metadata: triggerMetaData,
-				},
-			});
+			if (availableTriggerId) {
+				await tx.trigger.update({
+					where: {
+						taskId: taskId,
+					},
+					data: {
+						availableTriggersId: availableTriggerId,
+						metadata: triggerMetaData || {}, // Optional trigger metadata
+					},
+				});
+			}
 
-			await tx.task.update({
-				where: {
-					id: taskId,
-				},
-				data: {
-					triggerId: trigger.id,
-				},
-			});
+			if (actions) {
+				await tx.action.deleteMany({
+					where: {
+						taskId: taskId,
+					},
+				});
 
-			await tx.action.deleteMany({
-				where: {
-					taskId: taskId,
-				},
-			});
-
-			await tx.action.createMany({
-				data: actions.map((action) => ({
-					taskId: taskId,
-					availableActionsId: action.availableActionId,
-					metadata: action.metaData || {},
-					sortingOrder: action.sortingOrder,
-				})),
-			});
+				await tx.action.createMany({
+					data: actions.map((action) => ({
+						taskId: taskId,
+						availableActionsId: action.availableActionId,
+						metadata: action.metaData || {},
+						sortingOrder: action.sortingOrder,
+					})),
+				});
+			}
 
 			return task;
 		});
@@ -220,5 +238,138 @@ export const toggleRunning = catchAsync(
 		});
 
 		res.status(200).json(task);
+	}
+);
+
+export const getAllServicesWithConnectionStatus = catchAsync(
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+		const userId = req.user?.id;
+
+		// Fetch all services
+		const services = await prisma.app.findMany({
+			include: {
+				ServiceConnection: {
+					where: { userId: userId },
+				},
+			},
+		});
+
+		// Map services to include connection status
+		const servicesWithStatus = services.map((service) => {
+			const isConnected = service.ServiceConnection.length > 0;
+			const connectionDetails = isConnected
+				? service.ServiceConnection[0]
+				: null;
+
+			return {
+				id: service.id,
+				name: service.name,
+				image: service.image,
+				connected: isConnected ? 'Connected' : 'Disconnected',
+				connectionDetails: {
+					id: connectionDetails?.id,
+					accessToken: connectionDetails?.accessToken,
+					refreshToken: connectionDetails?.refreshToken,
+					expiresAt: connectionDetails?.expiresAt,
+				},
+			};
+		});
+
+		res.status(200).json(servicesWithStatus);
+	}
+);
+
+export const connectService = catchAsync(
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+		const userId = req.user?.id;
+		const { appId, accessToken, refreshToken, expiresAt } = req.body;
+
+		if (!userId) {
+			return next(
+				new AppError({ statusCode: 401, message: 'Unauthorized' })
+			);
+		}
+
+		const serviceConnection = await prisma.serviceConnection.create({
+			data: {
+				userId: userId,
+				appId: appId,
+				accessToken: accessToken,
+				refreshToken: refreshToken,
+				expiresAt: expiresAt,
+			},
+		});
+
+		res.status(201).json({
+			message: 'Service connected successfully',
+			serviceConnection,
+		});
+	}
+);
+
+export const disconnectService = catchAsync(
+	async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+		const userId = req.user?.id;
+		const { appId } = req.body;
+
+		if (!userId) {
+			return next(
+				new AppError({ statusCode: 401, message: 'Unauthorized' })
+			);
+		}
+
+		const serviceConnection = await prisma.serviceConnection.deleteMany({
+			where: {
+				userId: userId,
+				appId: appId,
+			},
+		});
+
+		if (serviceConnection.count === 0) {
+			return next(
+				new AppError({
+					statusCode: 404,
+					message: 'Service not connected',
+				})
+			);
+		}
+
+		res.status(200).json('Service disconnected successfully');
+	}
+);
+
+export const getAllApps = catchAsync(
+	async (req: Request, res: Response, next: NextFunction) => {
+		const apps = await prisma.app.findMany();
+
+		res.status(200).json(apps);
+	}
+);
+
+export const getTriggersForApp = catchAsync(
+	async (req: Request, res: Response, next: NextFunction) => {
+		const appId = req.params.appId;
+
+		const triggers = await prisma.availableTriggers.findMany({
+			where: {
+				appId: appId,
+			},
+		});
+
+		res.status(200).json(triggers);
+	}
+);
+
+export const getActionsForApp = catchAsync(
+	async (req: Request, res: Response, next: NextFunction) => {
+		const appId = req.params.appId;
+
+		const actions = await prisma.availableActions.findMany({
+			where: {
+				appId: appId,
+			},
+		});
+
+		res.status(200).json(actions);
 	}
 );

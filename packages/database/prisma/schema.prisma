@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id        String @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String @unique
-  password  String
-  tasks     Task[]
+  id                String              @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String              @unique
+  password          String
+  tasks             Task[]
+  ServiceConnection ServiceConnection[]
 }
 
 model Task {
@@ -36,6 +37,15 @@ model Task {
   LastRunedAt DateTime?
 }
 
+model App {
+  id                String              @id @default(cuid())
+  name              String
+  image             String?
+  availableTrigger  AvailableTriggers[]
+  availableActions  AvailableActions[]
+  ServiceConnection ServiceConnection[]
+}
+
 model Trigger {
   id       String @id @default(cuid())
   metadata Json   @default("{}")
@@ -50,8 +60,9 @@ model Trigger {
 model AvailableTriggers {
   id       String    @id @default(cuid())
   name     String
-  image    String?
   triggers Trigger[]
+  App      App?      @relation(fields: [appId], references: [id])
+  appId    String?
 }
 
 model Action {
@@ -69,8 +80,22 @@ model Action {
 model AvailableActions {
   id      String   @id @default(cuid())
   name    String
-  image   String?
   actions Action[]
+  App     App?     @relation(fields: [appId], references: [id])
+  appId   String?
+}
+
+model ServiceConnection {
+  id           String    @id @default(cuid())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  app          App       @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId        String
+  accessToken  String?
+  refreshToken String?
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model TaskRun {
