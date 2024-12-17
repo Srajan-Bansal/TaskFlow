@@ -51,27 +51,6 @@ export const verifyUser = async () => {
 
 	return res.data;
 };
-export const getAvailableTriggers = async () => {
-	const res = await axios.get(
-		`${BACKEND_URL}/api/v1/trigger/availableTriggers`,
-		{
-			withCredentials: true,
-		}
-	);
-
-	return res.data;
-};
-
-export const getAvailableActions = async () => {
-	const res = await axios.get(
-		`${BACKEND_URL}/api/v1/action/availableActions`,
-		{
-			withCredentials: true,
-		}
-	);
-
-	return res.data;
-};
 
 export const createTask = async (task: any) => {
 	const res = await axios.post(`${BACKEND_URL}/api/v1/task`, task, {
@@ -114,5 +93,39 @@ export const toggleTaskRunning = async (id: string, isOff: boolean) => {
 		}
 	);
 
+	return res.data;
+};
+
+export const fetchServiceConnections = async () => {
+	const res = await axios.get(`${BACKEND_URL}/api/v1/task/services`, {
+		withCredentials: true,
+	});
+	return res.data;
+};
+
+export const fetchApps = async () => {
+	const res = await axios.get(`${BACKEND_URL}/api/v1/task/apps`, {
+		withCredentials: true,
+	});
+	return res.data;
+};
+
+export const actionsForApp = async (appId: string) => {
+	const res = await axios.get(
+		`${BACKEND_URL}/api/v1/task/app/${appId}/actions`,
+		{
+			withCredentials: true,
+		}
+	);
+	return res.data;
+};
+
+export const triggersForApp = async (appId: string) => {
+	const res = await axios.get(
+		`${BACKEND_URL}/api/v1/task/app/${appId}/triggers`,
+		{
+			withCredentials: true,
+		}
+	);
 	return res.data;
 };

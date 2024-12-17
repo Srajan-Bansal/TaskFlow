@@ -3,6 +3,7 @@ export type Task = {
 	title: string;
 	description?: string;
 	userId?: string;
+	app: App[];
 	actions: {
 		id: string;
 		taskId: string;
@@ -22,16 +23,33 @@ export type Task = {
 	Running: boolean;
 };
 
-export type availableAction = {
+export type App = {
 	id: string;
 	name: string;
 	image: string;
 };
 
+export type availableAction = {
+	id: string;
+	name: string;
+};
+
 export type availableTrigger = {
 	id: string;
 	name: string;
-	image: string;
+};
+
+export type ServiceConnection = {
+	id: string;
+	name: string;
+	image?: string;
+	connected: 'Connected' | 'Disconnected';
+	connectionDetails?: {
+		id: string;
+		accessToken?: string;
+		refreshToken?: string;
+		expiresAt?: Date;
+	};
 };
 
 export type SignUpUser = {

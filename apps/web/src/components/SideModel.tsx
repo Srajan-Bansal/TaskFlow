@@ -1,25 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { FlowModal } from './FlowModel';
-import { useAvailableActionsAndTriggers } from '../hooks/useAvailableActoinsAndTriggers';
+import { actionsForApp, triggersForApp } from '../lib/api';
 import { type Node } from '@xyflow/react';
-import { availableAction, availableTrigger } from '../types/types';
+import { availableAction, availableTrigger, App } from '../types/types';
 
 export function SideModel({
 	isOpen,
 	onClose,
 	selectedNode,
 	onSelectItem,
+	apps,
+	selectedAppId,
+	setSelectedAppId,
 }: {
 	isOpen: boolean;
 	onClose: () => void;
 	selectedNode: Node | null;
 	onSelectItem: (item: availableAction | availableTrigger) => void;
+	apps: App[];
+	selectedAppId: string | null;
+	setSelectedAppId: (id: string) => void;
 }) {
 	const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
-	const { availableActions, availableTriggers } =
-		useAvailableActionsAndTriggers();
+	const [availableActions, setAvailableActions] = useState<availableAction[]>(
+		[]
+	);
+	const [availableTriggers, setAvailableTriggers] = useState<
+		availableTrigger[]
+	>([]);
+	const [selectedItemName, setSelectedItemName] = useState<string | null>(
+		null
+	);
 	const selectedNodeType = selectedNode?.type;
+
+	useEffect(() => {
+		if (selectedAppId) {
+			const fetchAvailableItems = async () => {
+				try {
+					if (selectedNodeType === 'action') {
+						const actions = await actionsForApp(selectedAppId);
+						setAvailableActions(actions);
+					} else if (selectedNodeType === 'trigger') {
+						const triggers = await triggersForApp(selectedAppId);
+						setAvailableTriggers(triggers);
+					}
+				} catch (error) {
+					console.error('Error fetching actions or triggers:', error);
+				}
+			};
+
+			fetchAvailableItems();
+		}
+	}, [selectedAppId, selectedNodeType]);
+
+	const handleSelectItem = (item: availableAction | availableTrigger) => {
+		setSelectedItemName(item.name);
+		onSelectItem(item);
+		setIsFlowModalOpen(false);
+	};
+
+	const handleChangeApp = (appId: string) => {
+		setSelectedAppId(appId);
+		setSelectedItemName(null);
+		setIsFlowModalOpen(false);
+	};
 
 	if (!isOpen) return null;
 
@@ -34,24 +79,37 @@ export function SideModel({
 				</div>
 
 				<div className='space-y-5'>
-					<div>
-						<h3 className='text-base font-medium text-gray-700'>
-							{selectedNodeType === 'trigger'
-								? 'Trigger'
-								: 'Action'}
-						</h3>
-						<button
-							onClick={() => setIsFlowModalOpen(true)}
-							className='text-base text-blue-600 hover:text-blue-700'
-						>
-							Change
-						</button>
-						<p className='text-sm text-gray-500 mt-3'>
-							{selectedNodeType === 'trigger'
-								? 'Configure when this workflow should be triggered'
-								: 'Configure what this workflow should do'}
-						</p>
-					</div>
+					<h3 className='text-base font-medium text-gray-700'>
+						APP Service
+					</h3>
+					<p className='text-gray-900 font-semibold'>
+						{selectedAppId || 'None Selected'}
+					</p>
+					<button
+						onClick={() => setIsFlowModalOpen(true)}
+						className='text-base text-blue-600 hover:text-blue-700'
+					>
+						Change
+					</button>
+
+					<h3 className='text-base font-medium text-gray-700'>
+						{selectedNodeType === 'trigger' ? 'Trigger' : 'Action'}
+					</h3>
+					<p className='text-gray-900 font-semibold'>
+						{selectedItemName || 'None Selected'}
+					</p>
+
+					<button
+						onClick={() => setIsFlowModalOpen(true)}
+						className='text-base text-blue-600 hover:text-blue-700'
+					>
+						Change
+					</button>
+					<p className='text-sm text-gray-500 mt-3'>
+						{selectedNodeType === 'trigger'
+							? 'Configure when this workflow should be triggered'
+							: 'Configure what this workflow should do'}
+					</p>
 
 					<div>
 						<h3 className='text-base font-medium text-gray-700'>
@@ -88,7 +146,14 @@ export function SideModel({
 							? availableActions
 							: availableTriggers
 					}
-					onSelectItem={onSelectItem}
+					onSelectItem={(
+						item: availableAction | availableTrigger
+					) => {
+						handleSelectItem(item);
+						if (selectedNodeType === 'action') {
+							setIsFlowModalOpen(false);
+						}
+					}}
 				/>
 			)}
 		</>

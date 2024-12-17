@@ -38,11 +38,6 @@ export function FlowModal({
 								onClose();
 							}}
 						>
-							<img
-								src={item.image}
-								alt={item.name}
-								className='w-10 h-10 rounded-lg'
-							/>
 							<div>{item.name}</div>
 						</div>
 					))}

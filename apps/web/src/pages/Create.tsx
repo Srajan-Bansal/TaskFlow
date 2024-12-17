@@ -19,6 +19,7 @@ import {
 	Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { Spinner } from '@repo/ui/Spinner';
 import { Workflow, Zap } from 'lucide-react';
 import { PrimaryButton } from '@repo/ui/PrimaryButton';
 import {
@@ -27,9 +28,10 @@ import {
 	availableAction,
 	availableTrigger,
 	NodeConnection,
+	App,
 } from '../types/types';
 import { SideModel } from '../components/SideModel';
-import { createTask, getTask, updateTask } from '../lib/api';
+import { createTask, getTask, updateTask, fetchApps } from '../lib/api';
 import { showErrorToast } from '../lib/toaster';
 import { initialNodes, initialEdges, defaultEdgeOptions } from '../config';
 
@@ -67,7 +69,6 @@ const nodeTypes = {
 	trigger: triggerNode,
 	action: actionNode,
 } as const;
-
 export const Create = () => {
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 	const [edges, setEdges] = useState<Edge[]>(initialEdges);
@@ -75,6 +76,10 @@ export const Create = () => {
 	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 	const [nodeConnectionsMap, setNodeConnectionsMap] =
 		useState<NodeConnection>({});
+	const [apps, setApps] = useState<App[]>([]);
+	const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+	const [isInitialLoading, setIsInitialLoading] = useState(true);
+	const [isSaving, setIsSaving] = useState(false);
 
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -92,6 +97,8 @@ export const Create = () => {
 	const onConnect: OnConnect = useCallback(
 		(params: Connection) => {
 			const { source, target } = params;
+			if (!source || !target) return;
+
 			setNodeConnectionsMap((prev) => ({
 				...prev,
 				[source]: prev[source] || { incoming: 0, outgoing: 0 },
@@ -110,17 +117,17 @@ export const Create = () => {
 				...prev,
 				[source]: {
 					...prev[source],
-					outgoing: prev[source].outgoing + 1,
+					outgoing: (prev[source]?.outgoing || 0) + 1,
 				},
 				[target]: {
 					...prev[target],
-					incoming: prev[target].incoming + 1,
+					incoming: (prev[target]?.incoming || 0) + 1,
 				},
 			}));
 
 			setEdges((eds) => addEdge(params, eds));
 		},
-		[nodeConnectionsMap, setEdges]
+		[nodeConnectionsMap]
 	);
 
 	const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
@@ -139,16 +146,8 @@ export const Create = () => {
 			data: { label: 'New Action' },
 		};
 
-		const newEdge: Edge = {
-			id: `e-${nodes[nodes.length - 1]}-${newActionNode.id}`,
-			source: nodes[nodes.length - 1].id,
-			target: newActionNode.id,
-			animated: true,
-		};
-
 		setNodes((nds) => [...nds, newActionNode]);
-		setEdges((eds) => [...eds, newEdge]);
-	}, [nodes, edges]);
+	}, [nodes]);
 
 	const handleSelectItem = useCallback(
 		(item: availableAction | availableTrigger) => {
@@ -172,6 +171,7 @@ export const Create = () => {
 
 	const publishWorkflow = async () => {
 		try {
+			setIsSaving(true);
 			const triggerNode = nodes.find((node) => node.type === 'trigger');
 			const actionNodes = nodes.filter((node) => node.type === 'action');
 
@@ -200,28 +200,35 @@ export const Create = () => {
 			navigate('/app/home');
 		} catch (error) {
 			showErrorToast('Failed to create workflow');
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
 	useEffect(() => {
 		const fetchData = async () => {
+			setIsInitialLoading(true);
 			try {
-				const res = await getTask(id as string);
-				console.log(res);
+				const [taskData, availableApps] = await Promise.all([
+					id ? getTask(id) : null,
+					fetchApps(),
+				]);
 
-				if (res) {
+				setApps(availableApps);
+
+				if (taskData) {
 					const triggerNode: Node = {
-						id: res.triggerId,
+						id: taskData.triggerId,
 						type: 'trigger',
 						position: { x: 250, y: 50 },
 						data: {
-							id: res.trigger.availableTrigger.id,
-							label: res.trigger.availableTrigger.name,
+							id: taskData.trigger.availableTrigger.id,
+							label: taskData.trigger.availableTrigger.name,
 						},
 					};
 
-					const actionNodes: Node[] = res.actions.map(
-						(action: ActionNode, index: number) => ({
+					const actionNodes: Node[] = taskData.actions.map(
+						(action: any, index: number) => ({
 							id: action.id,
 							type: 'action',
 							position: { x: 250, y: 200 + index * 150 },
@@ -234,36 +241,40 @@ export const Create = () => {
 					);
 
 					const edges: Edge[] = actionNodes.map(
-						(actionNode, index) => {
-							if (index === 0) {
-								return {
-									id: `e-${triggerNode.id}-${actionNode.id}`,
-									source: triggerNode.id,
-									target: actionNode.id,
-									animated: true,
-								};
-							} else {
-								return {
-									id: `e-${actionNodes[index - 1].id}-${actionNode.id}`,
-									source: actionNodes[index - 1].id,
-									target: actionNode.id,
-									animated: true,
-								};
-							}
-						}
+						(actionNode, index) => ({
+							id:
+								index === 0
+									? `e-${triggerNode.id}-${actionNode.id}`
+									: `e-${actionNodes[index - 1].id}-${actionNode.id}`,
+							source:
+								index === 0
+									? triggerNode.id
+									: actionNodes[index - 1].id,
+							target: actionNode.id,
+							animated: true,
+						})
 					);
 
 					setNodes([triggerNode, ...actionNodes]);
 					setEdges(edges);
-				} else {
-					showErrorToast('No task data found');
 				}
 			} catch (error) {
-				showErrorToast('Failed to fetch task');
+				showErrorToast('Failed to fetch data');
+			} finally {
+				setIsInitialLoading(false);
 			}
 		};
+
 		fetchData();
 	}, [id]);
+
+	if (isInitialLoading) {
+		return (
+			<div className='w-full h-[700px] flex items-center justify-center'>
+				<Spinner size='lg' />
+			</div>
+		);
+	}
 
 	return (
 		<div className='w-full h-[700px] relative'>
@@ -272,6 +283,7 @@ export const Create = () => {
 					<PrimaryButton
 						onClick={addActionNode}
 						className='flex items-center gap-2'
+						disabled={isSaving}
 					>
 						<Workflow className='w-4 h-4' />
 						Add Action
@@ -282,11 +294,20 @@ export const Create = () => {
 					<PrimaryButton
 						onClick={publishWorkflow}
 						className='flex items-center gap-2'
+						disabled={isSaving}
 					>
-						Publish Workflow
+						{isSaving ? (
+							<div className='flex items-center gap-2'>
+								<Spinner size='sm' />
+								Publishing...
+							</div>
+						) : (
+							'Publish Workflow'
+						)}
 					</PrimaryButton>
 				</div>
 			</div>
+
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
@@ -315,9 +336,13 @@ export const Create = () => {
 				isOpen={isModelOpen}
 				onClose={() => {
 					setIsModelOpen(false);
+					setSelectedNode(null);
 				}}
 				selectedNode={selectedNode}
 				onSelectItem={handleSelectItem}
+				apps={apps}
+				selectedAppId={selectedAppId}
+				setSelectedAppId={setSelectedAppId}
 			/>
 		</div>
 	);
