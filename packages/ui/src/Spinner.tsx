@@ -1,10 +1,10 @@
-export const Spinner = () => {
+export const Spinner = ({ size }: { size?: 'sm' | 'md' | 'lg' }) => {
 	return (
 		<div className='flex items-center justify-center h-screen'>
 			<svg
 				xmlns='http://www.w3.org/2000/svg'
-				width='48'
-				height='48'
+				width={size === 'sm' ? '24' : size === 'md' ? '36' : '48'}
+				height={size === 'sm' ? '24' : size === 'md' ? '36' : '48'}
 				viewBox='0 0 24 24'
 				fill='none'
 				stroke='currentColor'

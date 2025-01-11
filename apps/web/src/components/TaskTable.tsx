@@ -23,14 +23,14 @@ export function TaskTable({
 		<div className='p-8 max-w-screen-lg w-full mx-auto'>
 			<div className='flex font-bold'>
 				<div className='w-1/5'>Delete</div>
-				<div className='w-1/5'>Name</div>
-				<div className='w-1/5'>Name</div>
-				<div className='w-1/5'>Last Runned At</div>
+				<div className='w-1/5'>Apps</div> {/* Updated header */}
+				<div className='w-1/5'>Title</div>
+				<div className='w-1/5'>Last Run At</div>
 				<div className='w-[10%]'>Running</div>
 				<div className='w-[30%]'>Webhook URL</div>
 			</div>
 			{tasks.length === 0 ? (
-				<div className='py-4'>No tasks found.</div>
+				<div className='py-4 flex justify-center'>No tasks found.</div>
 			) : (
 				tasks.map((task) => (
 					<div
@@ -50,18 +50,12 @@ export function TaskTable({
 							</button>
 						</div>
 						<div className='w-1/5 flex'>
-							<img
-								className='w-6 h-6 rounded-lg'
-								key={task.id}
-								src={task.trigger.availableTrigger.image}
-								alt={task.trigger.availableTrigger.name}
-							/>
-							{task.actions.map((x) => (
+							{task.app.map((x) => (
 								<img
 									key={x.id}
-									src={x.availableAction.image}
-									alt={x.availableAction.name}
-									className='w-[30px] h-[30px]'
+									className='w-6 h-6 rounded-lg mr-2'
+									src={x.image}
+									alt={x.name}
 								/>
 							))}
 						</div>
